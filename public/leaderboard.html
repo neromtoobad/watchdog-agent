@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WATCHDOG — Fleet Leaderboard</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+<link rel="stylesheet" href="/assets/watchdog.css" />
+<script src="/assets/avatar.js"></script>
+</head>
+<body>
+<div id="stage">
+  <div id="app">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="/assets/bg.mp4" type="video/mp4" />
+    </video>
+
+    <!-- SIDEBAR (same as dashboard) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><img src="/assets/watchdog-mark.png" alt="WATCHDOG" /></div>
+        <div><div class="brand-name">WATCH<b>DOG</b></div></div>
+      </div>
+      <div class="brand-tag">Behavioral Monitor</div>
+
+      <nav class="nav">
+        <div class="nav-label">Monitoring</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Overview
+        </a>
+        <a href="/leaderboard.html" class="nav-item active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          Leaderboard
+        </a>
+        <a href="/ledger.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Ledger
+        </a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="sdk-card">
+          <div class="t">Wrap any agent · 3 lines</div>
+          <div class="sdk-code">
+            <span class="c">// gate every trade</span><br/>
+            <span class="k">await</span> watchdog.<br/>
+            &nbsp;&nbsp;<span class="k">checkTrade</span>(t)
+          </div>
+        </div>
+        <div class="conn"><span class="dot"></span><span>Live on</span>&nbsp;<b>Bitget</b></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1>Fleet Leaderboard</h1>
+          <div class="sub">a reputation layer for autonomous trading agents</div>
+        </div>
+        <div class="right">
+          <div class="updated" id="updated">connecting…</div>
+        </div>
+      </header>
+
+      <section class="canvas">
+        <div class="stats">
+          <div class="stat rv">
+            <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>Agents Tracked</div>
+            <div class="val mono" id="stat-total">—</div>
+            <div class="delta up"><span>fleet registry</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Avg Trust</div>
+            <div class="val mono" id="stat-avg">—<small>/100</small></div>
+            <div class="delta warn"><span>weighted EMA</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M8 12l3 3 5-6"/></svg>Healthy · Caution · Unsafe</div>
+            <div class="val mono" id="stat-bands">—</div>
+            <div class="delta warn"><span>by band</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.6 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/></svg>Total Incidents</div>
+            <div class="val mono" id="stat-incidents">—</div>
+            <div class="delta down"><span>across fleet</span></div>
+          </div>
+        </div>
+
+        <div class="panel rv" style="flex:1;min-height:0;">
+          <div class="panel-head">
+            <h2>Ranking</h2>
+            <span class="hint">highest trust first · ★ leader spotlighted</span>
+            <span class="chip live"><span class="d"></span>LIVE</span>
+          </div>
+          <div class="scroll">
+            <table>
+              <thead><tr>
+                <th class="left">#</th><th class="left">Agent</th><th>Trust Score</th><th>Trend</th><th>Trades</th><th>Incidents</th><th>Status</th>
+              </tr></thead>
+              <tbody id="board-body">
+                <tr class="empty-row"><td colspan="7">no agents registered — start a watchdog with fleet.register=true</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="footnote">watchdog · the reputation layer for autonomous agents</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  function fit(){ const s=Math.min(window.innerWidth/1440, window.innerHeight/920); stage.style.transform='scale('+s+')'; }
+  window.addEventListener('resize',fit); fit();
+})();
+
+const POLL_MS=3000;
+function scoreColor(s){return s>=80?'var(--green)':s>=50?'var(--amber)':'var(--red)';}
+function statusFor(band){return band==='healthy'?'ok':band==='caution'?'watch':'paused';}
+function statusLabel(st){return st==='ok'?'Healthy':st==='watch'?'Watch':'Paused';}
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function hhmmss(d=new Date()){return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
+
+function renderSummary(profiles){
+  const total=profiles.length;
+  document.getElementById('stat-total').textContent=String(total);
+  if(total===0){
+    document.getElementById('stat-avg').innerHTML='—<small>/100</small>';
+    document.getElementById('stat-bands').innerHTML='—';
+    document.getElementById('stat-incidents').textContent='—';
+    return;
+  }
+  const avg=Math.round(profiles.reduce((a,p)=>a+(p.trustScore||0),0)/total);
+  document.getElementById('stat-avg').innerHTML=`${avg}<small>/100</small>`;
+  const counts={healthy:0,caution:0,unsafe:0};
+  let incidents=0;
+  for(const p of profiles){ counts[p.band]=(counts[p.band]||0)+1; incidents+=p.incidents||0; }
+  document.getElementById('stat-bands').innerHTML=
+    `<span style="color:var(--green)">${counts.healthy}</span> · <span style="color:var(--amber)">${counts.caution}</span> · <span style="color:var(--red)">${counts.unsafe}</span>`;
+  document.getElementById('stat-incidents').textContent=String(incidents);
+}
+
+function renderBoard(profiles){
+  const body=document.getElementById('board-body');
+  if(!Array.isArray(profiles)||profiles.length===0){
+    body.innerHTML='<tr class="empty-row"><td colspan="7">no agents registered — start a watchdog with fleet.register=true</td></tr>';
+    return;
+  }
+  body.innerHTML=profiles.map((p,i)=>{
+    const score=Math.max(0,Math.min(100,Math.round(p.trustScore||0)));
+    const st=statusFor(p.band);
+    const trend=p.trend==='up'?'▲ rising':p.trend==='down'?'▼ falling':'— stable';
+    const trendC=p.trend==='up'?'var(--green)':p.trend==='down'?'var(--red)':'var(--muted-2)';
+    const rank=i===0?'★ 1':String(i+1).padStart(2,'0');
+    const rankC=i===0?'color:var(--accent);font-weight:700;':'';
+    return `<tr>
+      <td class="rank" style="${rankC}">${rank}</td>
+      <td class="agent"><div class="who">
+        <div class="av">${WD.agentAvatar(p.agentId)}</div>
+        <div><div class="nm">${escapeHtml(p.agentId)}</div><div class="by">updated ${(Math.round((Date.now()-(p.updatedAt||Date.now()))/1000))}s ago</div></div>
+      </div></td>
+      <td><div class="score-wrap">
+        <span class="score" style="color:${scoreColor(score)}">${score}</span>
+        <span class="score-bar"><i style="width:${score}%;background:${scoreColor(score)}"></i></span>
+      </div></td>
+      <td class="pnl" style="color:${trendC}">${trend}</td>
+      <td class="mono" style="color:var(--muted)">${p.totalTrades||0}</td>
+      <td class="mono" style="color:${(p.incidents||0)>0?'var(--red)':'var(--muted)'}">${p.incidents||0}</td>
+      <td><span class="st ${st}"><span class="d"></span>${statusLabel(st)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+async function tick(){
+  try{
+    const res=await fetch('/api/leaderboard',{cache:'no-store'});
+    if(!res.ok) throw new Error('http '+res.status);
+    const profiles=await res.json();
+    renderSummary(profiles); renderBoard(profiles);
+    document.getElementById('updated').textContent='live · '+hhmmss();
+  } catch(e){ document.getElementById('updated').textContent='reconnecting…'; }
+}
+window.addEventListener('load',()=>{
+  const rvs=[...document.querySelectorAll('.rv')];
+  rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
+  setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
+  tick(); setInterval(tick,POLL_MS);
+});
+</script>
+</body>
+</html>

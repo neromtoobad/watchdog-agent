@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WATCHDOG — Trade Ledger</title>
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
+<link rel="stylesheet" href="/assets/watchdog.css" />
+<style>
+  .dir-long, .dir-short, .result-win, .result-loss, .result-flat {
+    font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  }
+  .dir-long{color:var(--green);} .dir-short{color:var(--red);}
+  .result-win{color:var(--green);} .result-loss{color:var(--red);} .result-flat{color:var(--amber);}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;background:var(--panel-3);border:1px solid var(--line);font-size:11.5px;}
+  .pill .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  .pill.ok .dot{background:var(--green);box-shadow:0 0 8px var(--green);}
+  .pill.warn .dot{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+  .pill.bad .dot{background:var(--red);box-shadow:0 0 8px var(--red);}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="app">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+      <source src="/assets/bg.mp4" type="video/mp4" />
+    </video>
+
+    <!-- SIDEBAR (same as dashboard) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><img src="/assets/watchdog-mark.png" alt="WATCHDOG" /></div>
+        <div><div class="brand-name">WATCH<b>DOG</b></div></div>
+      </div>
+      <div class="brand-tag">Behavioral Monitor</div>
+
+      <nav class="nav">
+        <div class="nav-label">Monitoring</div>
+        <a href="/" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+          Overview
+        </a>
+        <a href="/leaderboard.html" class="nav-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+          Leaderboard
+        </a>
+        <a href="/ledger.html" class="nav-item active" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          Ledger
+        </a>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div class="sdk-card">
+          <div class="t">Wrap any agent · 3 lines</div>
+          <div class="sdk-code">
+            <span class="c">// gate every trade</span><br/>
+            <span class="k">await</span> watchdog.<br/>
+            &nbsp;&nbsp;<span class="k">checkTrade</span>(t)
+          </div>
+        </div>
+        <div class="conn"><span class="dot"></span><span>Live on</span>&nbsp;<b>Bitget</b></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <header class="topbar">
+        <div>
+          <h1>Trade Ledger</h1>
+          <div class="sub">reconstructed FIFO-per-symbol from the live event stream</div>
+        </div>
+        <div class="right">
+          <span class="pill" id="agent-pill">agent · —</span>
+          <span class="pill" id="trust-pill">trust —</span>
+          <div class="updated" id="updated">connecting…</div>
+        </div>
+      </header>
+
+      <section class="canvas">
+        <div class="stats cols-6">
+          <div class="stat rv">
+            <div class="lbl">Start equity</div>
+            <div class="val mono" id="stat-start">—</div>
+            <div class="delta warn"><span>USDT</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl">Current equity</div>
+            <div class="val mono" id="stat-equity">—</div>
+            <div class="delta warn" id="stat-equity-sub"><span>vs start</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl">Net P&L</div>
+            <div class="val mono" id="stat-pnl">—</div>
+            <div class="delta warn" id="stat-pnl-pct"><span>—</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl">Trades</div>
+            <div class="val mono" id="stat-trades">—</div>
+            <div class="delta warn" id="stat-open"><span>— open</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl">Win rate</div>
+            <div class="val mono" id="stat-wr">—</div>
+            <div class="delta warn" id="stat-wr-sub"><span>— W / — L</span></div>
+          </div>
+          <div class="stat rv">
+            <div class="lbl">Profit factor</div>
+            <div class="val mono" id="stat-pf">—</div>
+            <div class="delta warn" id="stat-pf-sub"><span>avg W / avg L</span></div>
+          </div>
+        </div>
+
+        <div class="panel rv" style="flex:1;min-height:0;">
+          <div class="panel-head">
+            <h2>Trade history</h2>
+            <span class="hint">newest first · FIFO per symbol</span>
+            <span class="chip live"><span class="d"></span>LIVE</span>
+          </div>
+          <div class="scroll">
+            <table>
+              <thead><tr>
+                <th class="left">#</th><th class="left">Opened</th><th class="left">Closed</th>
+                <th class="left">Symbol</th><th class="left">Dir</th>
+                <th>Size</th><th>P&amp;L</th><th>Return</th><th>Equity</th><th class="left">Result</th>
+              </tr></thead>
+              <tbody id="ledger-body">
+                <tr class="empty-row"><td colspan="10">no trades yet — run an agent demo to populate</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="footnote">watchdog · trade history reconstructed from /api/events</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  function fit(){ const s=Math.min(window.innerWidth/1440, window.innerHeight/920); stage.style.transform='scale('+s+')'; }
+  window.addEventListener('resize',fit); fit();
+})();
+
+const POLL_MS=2000;
+const fmtTime=(ts)=>{const d=new Date(ts);return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');};
+const fmtUsd=(n,sign=false)=>{if(n===null||n===undefined) return '—'; return (sign&&n>0?'+':'')+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
+const fmtPct=(n)=>n===null||n===undefined?'—':`${n>=0?'+':''}${n.toFixed(2)}%`;
+const cls=(n)=>n>0?'pos':n<0?'neg':'warn';
+const escapeHtml=(s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hhmmss(d=new Date()){return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
+
+function renderTable(trades,openCount){
+  const body=document.getElementById('ledger-body');
+  if(!trades.length&&!openCount){
+    body.innerHTML='<tr class="empty-row"><td colspan="10">no trades yet — run an agent demo to populate</td></tr>';
+    return;
+  }
+  const rows=trades.slice().reverse().map((t,i)=>{
+    const idx=trades.length-i;
+    const ret=t.sizeUsdt?(t.pnlUsdt/t.sizeUsdt)*100:0;
+    const pnlColor=t.pnlUsdt>0?'var(--green)':t.pnlUsdt<0?'var(--red)':'var(--amber)';
+    return `<tr>
+      <td class="rank">${idx}</td>
+      <td class="mono" style="color:var(--muted)">${fmtTime(t.openedAt)}</td>
+      <td class="mono" style="color:var(--muted)">${fmtTime(t.closedAt)}</td>
+      <td style="text-align:left;font-weight:600">${escapeHtml(t.symbol)}</td>
+      <td style="text-align:left"><span class="dir-${t.direction}">${t.direction}</span></td>
+      <td class="mono">${fmtUsd(t.sizeUsdt)}</td>
+      <td class="mono" style="color:${pnlColor};font-weight:600">${fmtUsd(t.pnlUsdt,true)}</td>
+      <td class="mono" style="color:${pnlColor}">${fmtPct(ret)}</td>
+      <td class="mono">${fmtUsd(t.equityAfter)}</td>
+      <td style="text-align:left"><span class="result-${t.result}">${t.result}</span></td>
+    </tr>`;
+  }).join('');
+  const openRow=openCount>0
+    ? `<tr class="empty-row"><td colspan="10" style="color:var(--amber)">+ ${openCount} open position${openCount===1?'':'s'} not yet closed</td></tr>`
+    : '';
+  body.innerHTML=rows+openRow;
+}
+
+async function tick(){
+  try{
+    const [lRes,sRes]=await Promise.all([fetch('/api/ledger',{cache:'no-store'}),fetch('/api/status',{cache:'no-store'})]);
+    const ledger=await lRes.json(), status=await sRes.json();
+    const s=ledger.summary;
+    const trust=status.trustScore||{score:100,band:'healthy'};
+
+    document.getElementById('agent-pill').innerHTML=`<span class="dot"></span>agent · ${escapeHtml(ledger.agentId||'—')}`;
+    const tp=document.getElementById('trust-pill');
+    tp.innerHTML=`<span class="dot"></span>trust ${trust.score} · ${trust.band}`;
+    tp.className='pill '+(trust.band==='healthy'?'ok':trust.band==='caution'?'warn':'bad');
+
+    document.getElementById('stat-start').textContent=fmtUsd(s.startEquity);
+    const eqEl=document.getElementById('stat-equity');
+    eqEl.textContent=fmtUsd(s.finalEquity);
+    eqEl.style.color=s.totalPnl>=0?'var(--green)':'var(--red)';
+    document.getElementById('stat-equity-sub').innerHTML=`<span>${fmtPct(s.totalReturnPct)} vs start</span>`;
+
+    const pnlEl=document.getElementById('stat-pnl');
+    pnlEl.textContent=fmtUsd(s.totalPnl,true);
+    pnlEl.style.color=s.totalPnl>=0?'var(--green)':'var(--red)';
+    document.getElementById('stat-pnl-pct').innerHTML=`<span>${fmtPct(s.totalReturnPct)}</span>`;
+
+    document.getElementById('stat-trades').textContent=String(s.totalTrades);
+    document.getElementById('stat-open').innerHTML=`<span>${s.openPositions} open</span>`;
+    document.getElementById('stat-wr').textContent=s.totalTrades?`${Math.round(s.winRate*100)}%`:'—';
+    document.getElementById('stat-wr-sub').innerHTML=`<span>${s.wins} W / ${s.losses} L</span>`;
+    document.getElementById('stat-pf').textContent=s.totalTrades?(s.profitFactor===null?'∞':s.profitFactor.toFixed(2)):'—';
+    document.getElementById('stat-pf-sub').innerHTML=`<span>avg W ${fmtUsd(s.avgWin)} · avg L ${fmtUsd(s.avgLoss)}</span>`;
+
+    renderTable(ledger.trades,s.openPositions);
+    document.getElementById('updated').textContent='live · '+hhmmss();
+  } catch(e){ document.getElementById('updated').textContent='reconnecting…'; }
+}
+window.addEventListener('load',()=>{
+  const rvs=[...document.querySelectorAll('.rv')];
+  rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
+  setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
+  tick(); setInterval(tick,POLL_MS);
+});
+</script>
+</body>
+</html>

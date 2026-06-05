@@ -1,0 +1,6 @@
+{
+  "summary": "Agent diagnosis-smoke opened 7 identical BTCUSDT long positions of $1,500 each within a single millisecond window, breaching the hourly trade frequency limit and continuing to open trades even after the first violation was raised.",
+  "likelyCause": "Runaway order loop — rapid-fire duplicate trade submissions triggered by a logic or event-handling defect rather than a discretionary overtrading or tilt pattern.",
+  "recommendation": "Halt new order submission immediately, implement a hard circuit-breaker that blocks further opens upon any frequency violation event, and audit the order-dispatch loop for missing deduplication or violation-check gating.",
+  "source": "ai"
+}

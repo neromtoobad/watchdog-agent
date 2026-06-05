@@ -1,0 +1,24 @@
+{
+  "endpoint": "GET /api/v2/spot/market/tickers",
+  "requestTime": "2026-06-04T12:34:38.614Z",
+  "data": [
+    {
+      "open": "67129",
+      "symbol": "BTCUSDT",
+      "high24h": "67246.68",
+      "low24h": "61366.97",
+      "lastPr": "63523.19",
+      "quoteVolume": "829946215.564952",
+      "baseVolume": "12956.479793",
+      "usdtVolume": "829946215.56495181",
+      "ts": "1780576477730",
+      "bidPr": "63523.18",
+      "askPr": "63523.19",
+      "bidSz": "0.479599",
+      "askSz": "0.295515",
+      "openUtc": "64146.36",
+      "changeUtc24h": "-0.00971",
+      "change24h": "-0.05371"
+    }
+  ]
+}
