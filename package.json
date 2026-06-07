@@ -8,10 +8,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "benchmark": "ts-node chaos/benchmark.ts",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "dashboard": "ts-node examples/demo-agent.ts",
+    "demo:chaos": "ts-node examples/chaos-agent.ts",
+    "demo:fleet": "ts-node examples/fleet-demo.ts",
+    "prepublishOnly": "npm run build"
   },
   "license": "MIT",
   "devDependencies": {
