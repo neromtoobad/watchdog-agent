@@ -57,6 +57,7 @@
     "dashboard": "ts-node examples/demo-agent.ts",
     "demo:chaos": "ts-node examples/chaos-agent.ts",
     "demo:fleet": "ts-node examples/fleet-demo.ts",
+    "pitch": "ts-node examples/pitch.ts",
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
