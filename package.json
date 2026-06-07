@@ -1,12 +1,54 @@
 {
   "name": "watchdog-agent",
   "version": "0.1.0",
-  "description": "Behavioral intelligence and safety layer for autonomous trading agents",
+  "description": "Behavioral intelligence layer for autonomous trading agents — live trust scoring, predictive breach forecasts, AI incident diagnosis, and a public fleet leaderboard. Wrap any Bitget agent in three lines.",
+  "keywords": [
+    "trading",
+    "agent",
+    "behavioral-monitoring",
+    "trust-score",
+    "bitget",
+    "risk",
+    "ai",
+    "crypto",
+    "guardrails",
+    "observability"
+  ],
+  "homepage": "https://github.com/neromtoobad/watchdog-agent#readme",
+  "bugs": {
+    "url": "https://github.com/neromtoobad/watchdog-agent/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neromtoobad/watchdog-agent.git"
+  },
+  "license": "MIT",
+  "author": "Moren808",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/dashboard.d.ts",
+      "default": "./dist/server/dashboard.js"
+    },
+    "./playbook": {
+      "types": "./dist/playbook/adapter.d.ts",
+      "default": "./dist/playbook/adapter.js"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "QUICKSTART.md",
+    "LICENSE"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "benchmark": "ts-node chaos/benchmark.ts",
@@ -17,7 +59,14 @@
     "demo:fleet": "ts-node examples/fleet-demo.ts",
     "prepublishOnly": "npm run build"
   },
-  "license": "MIT",
+  "peerDependencies": {
+    "express": "^4.18.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@bitget-ai/getagent-skill": "^0.2.1",
     "@types/express": "^4.17.21",

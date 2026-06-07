@@ -69,6 +69,14 @@ See [BENCHMARK.md](BENCHMARK.md) for the full per-scenario table. The chaos harn
 
 ## Three lines to integrate
 
+> **New here?** The [**Quickstart**](QUICKSTART.md) walks you through install →
+> wrap → gate → dashboard in five short steps. Or fork the copy-paste starter:
+> [`examples/wrap-your-agent.ts`](examples/wrap-your-agent.ts).
+
+```bash
+npm install watchdog-agent   # core library has zero runtime dependencies
+```
+
 ```typescript
 import { Watchdog } from 'watchdog-agent';
 
