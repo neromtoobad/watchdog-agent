@@ -58,7 +58,8 @@
     "demo:chaos": "ts-node examples/chaos-agent.ts",
     "demo:fleet": "ts-node examples/fleet-demo.ts",
     "pitch": "ts-node examples/pitch.ts",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test:live-agents": "ts-node examples/live-agent-test.ts"
   },
   "peerDependencies": {
     "express": "^4.18.0"
