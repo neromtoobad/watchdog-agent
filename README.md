@@ -188,8 +188,7 @@ The AI diagnosis in `examples/chaos-agent.ts` calls Anthropic's Claude. Set `WAT
 WATCHDOG is the layer that runs **on top of any Bitget agent**:
 
 - **Library** — wrap any Node/TypeScript agent in three lines
-- **MCP** — agents calling Bitget via the MCP server invoke `checkTrade` before each tool-use
-- **CLI / shell agents** — agents driven by `bgc` (Claude Code skills, OpenClaw) call the WATCHDOG CLI check
+- **MCP server** — expose WATCHDOG as Model Context Protocol tools so *any* agent that speaks MCP (including one trading through Bitget's own MCP) gates trades through behavioral monitoring, no library import required. See [MCP server](#mcp-server-any-agent-any-language) below.
 - **Playbook backtests** — pipe `signal_output[]` from a Bitget Playbook run through `replayPlaybookRun()` to get a combined **financial × behavioral** report ([`examples/playbook-watched.ts`](examples/playbook-watched.ts))
 
 The monitor's own market-context fetcher uses `bgc --read-only` exclusively — WATCHDOG **physically cannot place or cancel orders**. The thing that guards your agent can never touch your funds.
@@ -204,6 +203,31 @@ const report = await replayPlaybookRun(run, watchdog);
 ```
 
 Two strategies can both end at +5% PnL. The one that tilts hard mid-run has a low trust score and should not be deployed. **WATCHDOG is what tells you which is which.**
+
+---
+
+## MCP server — any agent, any language
+
+The library is for TypeScript agents. The **MCP server** is for everyone else: it exposes WATCHDOG as Model Context Protocol tools over stdio, so any MCP client — Claude Code, Cursor, an agent trading through Bitget's MCP — can gate trades through behavioral monitoring without importing a thing.
+
+```bash
+# wire it into any MCP client:
+claude mcp add watchdog -- npx -y watchdog-agent watchdog-mcp
+```
+
+Seven tools are exposed:
+
+| tool | purpose |
+|---|---|
+| `watchdog_check_trade` | gate a trade before it executes → `{ approved, reason, trustScore, forecasts }` |
+| `watchdog_report_closed` | report a closed position's PnL |
+| `watchdog_report_signal` | report a stated signal (catches tilt) |
+| `watchdog_register_agent` | set custom rules (optional — defaults otherwise) |
+| `watchdog_get_status` | five metrics + trust + paused state |
+| `watchdog_get_diagnosis` | latest AI incident report |
+| `watchdog_get_leaderboard` | fleet ranking by trust |
+
+An agent's loop becomes: call `watchdog_check_trade` → if `approved`, place the order via Bitget's MCP → call `watchdog_report_closed` on exit. Source: [`src/mcp/server.ts`](src/mcp/server.ts).
 
 ---
 
