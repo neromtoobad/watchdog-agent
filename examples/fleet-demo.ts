@@ -13,6 +13,8 @@
 import { Watchdog, WatchdogConfig, WatchdogRules } from '../src/index';
 import { createDashboardServer } from '../src/server/dashboard';
 import { clear, getLeaderboard } from '../src/intelligence/fleet';
+import { loadDotenv } from '../src/util/env';
+loadDotenv(); // a WATCHDOG_AI_API_KEY in .env lights up the AI Risk Officer
 import {
   control,
   overtrader,

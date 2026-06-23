@@ -11,6 +11,8 @@
 import { Watchdog, WatchdogConfig } from '../src/index';
 import { createDashboardServer } from '../src/server/dashboard';
 import { CONTROL } from '../chaos/scenarios';
+import { loadDotenv } from '../src/util/env';
+loadDotenv();
 
 const cfg: WatchdogConfig = {
   agentId: 'demo-agent',

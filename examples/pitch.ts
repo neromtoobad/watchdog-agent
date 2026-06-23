@@ -201,8 +201,34 @@ ${C.reset}${C.dim}   behavioral credit scoring for autonomous trading agents${C.
   line(`${C.dim}live at ${server.url}/leaderboard.html${C.reset}`);
   await wait(3500);
 
-  // ── ACT 7 — recovery ───────────────────────────────────────────────
-  banner('ACT 7', 'Fix the bug → reset → back to healthy', C.green);
+  // ── ACT 7 — the AI Risk Officer (the wow) ──────────────────────────
+  banner('ACT 7', 'The AI Risk Officer reasons over the whole fleet', C.teal);
+  line(`${C.dim}not a threshold check — an LLM reading every agent at once…${C.reset}`);
+  const review = await Watchdog.reviewFleet();
+  console.log('');
+  line(`${C.dim}source:${C.reset} ${review.source === 'ai' ? C.teal + 'AI supervisor (live LLM)' : C.amber + 'heuristic (add WATCHDOG_AI_API_KEY for live LLM)'}${C.reset}`);
+  if (review.topRisk) {
+    line(`${C.bold}top risk:${C.reset} ${C.red}${review.topRisk.agentId}${C.reset} — ${review.topRisk.reason}`);
+  }
+  if (review.earlyWarnings.length) {
+    line(`${C.bold}early warnings ${C.dim}(before any hard breach):${C.reset}`);
+    for (const wn of review.earlyWarnings.slice(0, 3)) line(`  ${C.amber}⚡${C.reset} ${wn.agentId} — ${wn.signal}`);
+  }
+  line(`${C.bold}fleet read:${C.reset}`);
+  wrap(review.fleetAssessment);
+  await wait(2500);
+
+  // ask it a question, live
+  console.log('');
+  line(`${C.dim}> asking: "which agent is most at risk, and is anyone starting to tilt?"${C.reset}`);
+  const answer = await Watchdog.askSupervisor('Which agent is most at risk, and is anyone starting to tilt?');
+  console.log('');
+  line(`${C.teal}${C.bold}risk officer:${C.reset}`);
+  wrap(answer.answer);
+  await wait(4000);
+
+  // ── ACT 8 — recovery ───────────────────────────────────────────────
+  banner('ACT 8', 'Fix the bug → reset → back to healthy', C.green);
   w.reset();
   for (let i = 0; i < 3; i++) {
     await w.checkTrade({ type: 'open', symbol: 'BTCUSDT', sizeUsdt: 100, direction: 'long' });
@@ -215,7 +241,7 @@ ${C.reset}${C.dim}   behavioral credit scoring for autonomous trading agents${C.
   // ── close ──────────────────────────────────────────────────────────
   banner('WATCHDOG', 'live · predictive · explainable · public', C.teal);
   line(`${C.white}a behavioral credit score for every trading agent.${C.reset}`);
-  line(`${C.dim}165 tests · MIT · three lines to integrate${C.reset}`);
+  line(`${C.dim}183 tests · MIT · three lines to integrate${C.reset}`);
   line(`${C.dim}github.com/neromtoobad/watchdog-agent${C.reset}`);
   console.log('');
   line(`${C.dim}dashboard still live at ${C.reset}${C.teal}${server.url}${C.reset}${C.dim} — Ctrl+C to stop${C.reset}`);

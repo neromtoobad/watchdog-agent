@@ -177,8 +177,10 @@ export class Watchdog {
   constructor(config: WatchdogConfig) {
     this.config = config;
     this.events = new RingBuffer<WatchdogEvent>(1000);
-    if (config.fleet?.register) fleet.register(config.agentId);
-    Watchdog.liveAgents.set(config.agentId, this); // for the fleet supervisor
+    if (config.fleet?.register) {
+      fleet.register(config.agentId);
+      Watchdog.liveAgents.set(config.agentId, this); // supervisor reviews the REGISTERED fleet only
+    }
   }
 
   private intake(status: RulesEvaluation): void {

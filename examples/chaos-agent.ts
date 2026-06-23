@@ -12,20 +12,11 @@
  *   WATCHDOG_PORT=3000 npx ts-node examples/chaos-agent.ts
  *   open http://localhost:3000
  */
-import * as fs from 'fs';
-import * as path from 'path';
 import { Watchdog, WatchdogConfig, TradeRequest, TradeDecision } from '../src/index';
 import { createDashboardServer } from '../src/server/dashboard';
 import { overtrader } from '../chaos/scenarios';
-
-// load .env.example into process.env (so the AI key is picked up without a real .env)
-const envPath = path.join(__dirname, '..', '.env.example');
-if (fs.existsSync(envPath)) {
-  for (const line of fs.readFileSync(envPath, 'utf8').split('\n')) {
-    const m = line.match(/^([A-Z0-9_]+)=(.*)$/);
-    if (m && m[2] && !process.env[m[1]]) process.env[m[1]] = m[2];
-  }
-}
+import { loadDotenv } from '../src/util/env';
+loadDotenv(); // .env first, then .env.example — picks up WATCHDOG_AI_API_KEY
 
 const cfg: WatchdogConfig = {
   agentId: 'chaos-agent',
