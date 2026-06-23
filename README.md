@@ -231,6 +231,32 @@ An agent's loop becomes: call `watchdog_check_trade` → if `approved`, place th
 
 ---
 
+## Beyond rules — what makes it un-clonable
+
+Most risk monitors are static thresholds + a chart. WATCHDOG adds two layers a rule engine can't have, plus a live-trading path:
+
+### Layer 5 — Learned baselines
+Static thresholds assume you know each agent's normal. You don't. WATCHDOG learns every agent's own normal per metric and scores deviation in **σ** — *"238 trades is 6.2σ above this agent's baseline"* beats *"238 > 10"*. A market-maker and a swing bot can't share one threshold; they can share a baseline. `watchdog.getBaselines()` / `getTopAnomaly()`.
+
+### Layer 6 — AI behavioral supervisor
+An LLM that reads the **whole fleet** — metric trajectories, σ-baselines, forecasts, events, live market context — and does three things rules can't:
+1. catches **emergent tilt before any metric trips** ("sizing creeping while win-rate falls — early revenge pattern")
+2. reasons across the fleet ("3 agents breached together → market event, not 3 bugs")
+3. **answers questions in plain language** — there's an "Ask the Risk Officer" box on the dashboard, a `GET /api/supervisor` + `POST /api/supervisor/ask`, and MCP tools `watchdog_supervisor_review` / `watchdog_ask_supervisor`.
+
+```ts
+await Watchdog.reviewFleet();                 // → { topRisk, earlyWarnings, fleetAssessment }
+await Watchdog.askSupervisor('who is most at risk and why?');
+```
+Falls back to a heuristic review with no API key, so it never breaks.
+
+### Live paper trading (runnability)
+[`examples/paper-trade.ts`](examples/paper-trade.ts) — a momentum agent on **real live Bitget price** (via `bgc --read-only`), every order gated by WATCHDOG. With Bitget Demo API keys it places **real demo orders**; without them it runs signal-only on real data.
+
+```bash
+npm run demo:paper        # live BTCUSDT price → decision → WATCHDOG gate → demo order
+```
+
 ## What's in the box
 
 ```

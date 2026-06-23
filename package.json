@@ -67,7 +67,8 @@
     "pitch": "ts-node examples/pitch.ts",
     "mcp": "ts-node src/mcp/server.ts",
     "prepublishOnly": "npm run build",
-    "test:live-agents": "ts-node examples/live-agent-test.ts"
+    "test:live-agents": "ts-node examples/live-agent-test.ts",
+    "demo:paper": "ts-node examples/paper-trade.ts"
   },
   "peerDependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
