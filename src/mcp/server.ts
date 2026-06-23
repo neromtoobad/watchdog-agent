@@ -153,6 +153,16 @@ server.registerTool('watchdog_get_leaderboard', {
   inputSchema: {},
 }, async () => ok({ leaderboard: Watchdog.getLeaderboard() }));
 
+server.registerTool('watchdog_supervisor_review', {
+  description: 'AI behavioral supervisor: reasons over the WHOLE fleet and returns the top risk, early warnings (degrading behavior before any hard violation), and a fleet-level assessment. This is judgement, not a threshold check.',
+  inputSchema: {},
+}, async () => ok(await Watchdog.reviewFleet()));
+
+server.registerTool('watchdog_ask_supervisor', {
+  description: 'Ask the AI behavioral supervisor a plain-language question about the fleet, e.g. "which agent is most at risk and why?" or "is anyone starting to tilt?". Reasons over live metric states, learned-baseline σ deviations, forecasts, and recent events.',
+  inputSchema: { question: z.string().describe('a plain-language question about agent behavior / fleet risk') },
+}, async (a) => ok(await Watchdog.askSupervisor(a.question)));
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);

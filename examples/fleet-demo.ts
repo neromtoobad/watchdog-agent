@@ -102,7 +102,7 @@ function snapshot() {
 
   // boot the dashboard pointed at the control agent for /api/status;
   // /api/leaderboard surfaces all 5 from the fleet registry
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
   await createDashboardServer(agents[0].w, port);
 
   console.log('\nopen the LEADERBOARD:  http://localhost:' + port + '/leaderboard.html');

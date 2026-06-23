@@ -26,7 +26,7 @@ const cfg: WatchdogConfig = {
   w.reportTradeClosed({ symbol: 'BTCUSDT', pnlUsdt: -90 });
   w.reportSignal({ signal: 'bearish', action: 'open-long' });
 
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
   await createDashboardServer(w, port);
 
   // keep generating activity every 3s so the dashboard is lively

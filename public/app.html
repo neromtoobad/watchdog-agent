@@ -68,6 +68,30 @@
   .ev .tx b{font-weight:700;color:var(--text);}
   .ev .tm{color:var(--muted-2);font-family:'JetBrains Mono',monospace;font-size:10.5px;}
   .ev.ok .dot{background:var(--green)} .ev.warn .dot{background:var(--amber)} .ev.crit .dot{background:var(--red)}
+
+  /* AI Risk Officer */
+  #risk-officer{margin-top:4px;border-color:rgba(46,230,207,0.22);}
+  .panel-head h2 .it{font-style:italic;color:var(--muted);font-weight:400;font-size:14px;}
+  .ro-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:16px;}
+  .ro-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:16px;}
+  .ro-card{background:var(--panel-3);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+  .ro-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2);margin-bottom:8px;}
+  .ro-label .ro-dim{text-transform:none;letter-spacing:0;color:var(--muted-2);font-size:9.5px;}
+  .ro-val{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;color:var(--red);}
+  .ro-sub{font-size:12.5px;color:var(--muted);line-height:1.55;}
+  .ro-warn-list{display:flex;flex-direction:column;gap:7px;}
+  .ro-warn{font-size:12px;color:#cdd7df;display:flex;gap:8px;align-items:flex-start;}
+  .ro-warn .b{color:var(--amber);flex:0 0 auto;}
+  .ro-warn .a{color:var(--text);font-weight:600;}
+  .ro-ask{display:flex;gap:10px;}
+  .ro-ask input{flex:1;background:#070b0e;border:1px solid var(--line-2);border-radius:10px;padding:12px 14px;color:var(--text);font-family:inherit;font-size:13px;outline:none;}
+  .ro-ask input:focus{border-color:var(--accent);}
+  .ro-ask button{padding:12px 22px;border-radius:10px;border:none;background:linear-gradient(180deg,var(--accent),var(--accent-deep));color:#04211e;font-weight:700;font-size:13px;cursor:pointer;}
+  .ro-ask button:disabled{opacity:.5;cursor:wait;}
+  .ro-answer{font-size:13.5px;line-height:1.65;color:#cdd7df;white-space:pre-wrap;min-height:0;}
+  .ro-answer:empty{display:none;}
+  .ro-answer .who{color:var(--accent);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;}
+  @media(max-width:900px){.ro-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -258,6 +282,36 @@
             </div>
           </div>
         </div>
+
+        <!-- LAYER 6 — AI RISK OFFICER -->
+        <div class="panel rv" id="risk-officer">
+          <div class="panel-head">
+            <h2>AI Risk Officer <span class="it">— reasons over the whole fleet</span></h2>
+            <span class="ai-tag" id="sup-source"><span class="d"></span>supervisor</span>
+          </div>
+          <div class="ro-body">
+            <div class="ro-grid">
+              <div class="ro-card">
+                <div class="ro-label">Top risk</div>
+                <div class="ro-val" id="ro-toprisk">—</div>
+                <div class="ro-sub" id="ro-toprisk-why"></div>
+              </div>
+              <div class="ro-card">
+                <div class="ro-label">Early warnings <span class="ro-dim">(before any hard breach)</span></div>
+                <div id="ro-warnings" class="ro-warn-list"><div class="ro-sub">scanning…</div></div>
+              </div>
+              <div class="ro-card">
+                <div class="ro-label">Fleet assessment</div>
+                <div class="ro-sub" id="ro-fleet">—</div>
+              </div>
+            </div>
+            <div class="ro-ask">
+              <input id="ro-q" type="text" placeholder="Ask the risk officer…  e.g. which agent is most at risk and why?" />
+              <button id="ro-send">Ask</button>
+            </div>
+            <div class="ro-answer" id="ro-answer"></div>
+          </div>
+        </div>
       </section>
     </div>
     <div class="footnote">watchdog · behavioral credit scoring for trading agents</div>
@@ -444,13 +498,47 @@ async function tickFleet(){
   } catch(e){}
 }
 
+// ── AI Risk Officer ──
+async function tickSupervisor(){
+  try{
+    const r=await fetch('/api/supervisor',{cache:'no-store'}).then(x=>x.json());
+    const src=document.getElementById('sup-source');
+    src.innerHTML=`<span class="d"></span>${r.source==='ai'?'AI supervisor':'heuristic'}`;
+    if(r.topRisk){
+      document.getElementById('ro-toprisk').textContent=r.topRisk.agentId;
+      document.getElementById('ro-toprisk-why').textContent=r.topRisk.reason||'';
+    } else {
+      document.getElementById('ro-toprisk').textContent='—';
+      document.getElementById('ro-toprisk-why').textContent='no agents under watch';
+    }
+    const wl=document.getElementById('ro-warnings');
+    if(r.earlyWarnings&&r.earlyWarnings.length){
+      wl.innerHTML=r.earlyWarnings.slice(0,4).map(w=>`<div class="ro-warn"><span class="b">⚡</span><span><span class="a">${escapeHtml(w.agentId)}</span> — ${escapeHtml(w.signal)}</span></div>`).join('');
+    } else { wl.innerHTML='<div class="ro-sub">none — all agents within their normal behavior</div>'; }
+    document.getElementById('ro-fleet').textContent=r.fleetAssessment||'—';
+  }catch(e){}
+}
+async function askRiskOfficer(){
+  const inp=document.getElementById('ro-q'), btn=document.getElementById('ro-send'), out=document.getElementById('ro-answer');
+  const q=inp.value.trim(); if(!q) return;
+  btn.disabled=true; out.innerHTML='<span class="who">risk officer</span>thinking…';
+  try{
+    const r=await fetch('/api/supervisor/ask',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question:q})}).then(x=>x.json());
+    out.innerHTML=`<span class="who">risk officer · ${r.source==='ai'?'AI':'heuristic'}</span>${escapeHtml(r.answer||'(no answer)')}`;
+  }catch(e){ out.innerHTML='<span class="who">risk officer</span>error: '+escapeHtml(e.message); }
+  finally{ btn.disabled=false; }
+}
+
 window.addEventListener('load',()=>{
   const rvs=[...document.querySelectorAll('.rv')];
   rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
   setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
-  tickStatus(); tickFleet();
+  document.getElementById('ro-send').addEventListener('click',askRiskOfficer);
+  document.getElementById('ro-q').addEventListener('keydown',(e)=>{ if(e.key==='Enter') askRiskOfficer(); });
+  tickStatus(); tickFleet(); tickSupervisor();
   setInterval(tickStatus,POLL_MS);
   setInterval(tickFleet,FLEET_POLL_MS);
+  setInterval(tickSupervisor,8000);
 });
 </script>
 </body>

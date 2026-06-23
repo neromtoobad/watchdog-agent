@@ -6,6 +6,9 @@ import { appendHistory, forecastBreaches } from './intelligence/forecast';
 import { generateDiagnosis } from './intelligence/diagnosis';
 import * as fleet from './intelligence/fleet';
 import { AuditChain } from './intelligence/audit';
+import { BaselineTracker, MetricBaseline } from './intelligence/baseline';
+import { reviewFleet, askSupervisor } from './intelligence/supervisor';
+import type { AgentSnapshot, FleetSnapshot, SupervisorReview, SupervisorAnswer } from './intelligence/supervisor';
 import { renderBadge as renderTrustBadge } from './badge/render';
 import { getMarketContext } from './market/context';
 import type { RulesEvaluation } from './engine/rules';
@@ -165,18 +168,25 @@ export class Watchdog {
   private totalTrades = 0;
   private incidents = 0;
   private readonly audit = new AuditChain();
+  private readonly baselines = new BaselineTracker();
 
   private static readonly TRUST_DROP_TRIGGER = 15;
+  /** live instances, for the fleet supervisor (separate from the persistent fleet registry) */
+  private static readonly liveAgents = new Map<string, Watchdog>();
 
   constructor(config: WatchdogConfig) {
     this.config = config;
     this.events = new RingBuffer<WatchdogEvent>(1000);
     if (config.fleet?.register) fleet.register(config.agentId);
+    Watchdog.liveAgents.set(config.agentId, this); // for the fleet supervisor
   }
 
   private intake(status: RulesEvaluation): void {
     const prevScore = this.currentTrust.score;
-    for (const m of status.metrics) appendHistory(this.metricHistory, m.name, m.value);
+    for (const m of status.metrics) {
+      appendHistory(this.metricHistory, m.name, m.value);
+      this.baselines.observe(m.name, m.value);   // learn this agent's normal
+    }
     this.currentTrust = computeTrust(status, prevScore);
     this.currentForecasts = forecastBreaches(this.metricHistory, this.config.rules);
 
@@ -352,6 +362,16 @@ export class Watchdog {
     return { ...this.currentTrust };
   }
 
+  /** Learned per-agent behavioral baselines (deviation from this agent's own normal, in σ). */
+  getBaselines(): MetricBaseline[] {
+    return this.baselines.all();
+  }
+
+  /** The single most-anomalous metric vs. this agent's learned normal. */
+  getTopAnomaly(): MetricBaseline | null {
+    return this.baselines.topAnomaly();
+  }
+
   getForecast(): Forecast[] {
     return this.currentForecasts.slice();
   }
@@ -384,11 +404,43 @@ export class Watchdog {
     this.totalTrades = 0;
     this.incidents = 0;
     this.audit.clear();
+    this.baselines.clear();
     this.recordEvent('reset', { agentId: this.config.agentId });
   }
 
   static getLeaderboard(): FleetProfile[] {
     return fleet.getLeaderboard();
+  }
+
+  /** A point-in-time behavioral snapshot of this agent for the supervisor. */
+  snapshot(): AgentSnapshot {
+    const st = this.getStatus();
+    return {
+      agentId: this.config.agentId,
+      trustScore: st.trustScore.score,
+      band: st.trustScore.band,
+      trend: st.trustScore.trend,
+      paused: st.paused,
+      metrics: Object.values(st.metrics).map((m) => ({ name: m.name, status: m.status, value: m.value, threshold: m.threshold })),
+      baselines: this.getBaselines(),
+      forecasts: this.getForecast().map((f) => ({ metric: f.metric, breachInTrades: f.breachInTrades })),
+      recentEvents: this.getEvents().slice(-12).map((e) => ({ type: e.type, payload: e.payload })),
+    };
+  }
+
+  /** Snapshot of every live agent + optional market context. */
+  static fleetSnapshot(marketContext?: FleetSnapshot['marketContext']): FleetSnapshot {
+    return { agents: [...Watchdog.liveAgents.values()].map((w) => w.snapshot()), marketContext: marketContext ?? null };
+  }
+
+  /** LAYER 6 — the AI supervisor reasons over the whole fleet. */
+  static async reviewFleet(): Promise<SupervisorReview> {
+    return reviewFleet(Watchdog.fleetSnapshot());
+  }
+
+  /** Ask the AI supervisor a plain-language question about the fleet. */
+  static async askSupervisor(question: string): Promise<SupervisorAnswer> {
+    return askSupervisor(question, Watchdog.fleetSnapshot());
   }
 
   static renderBadge(agentId: string): string {
@@ -402,5 +454,9 @@ export class Watchdog {
     this.events.push({ timestamp: Date.now(), type, payload });
   }
 }
+
+export type { MetricBaseline } from './intelligence/baseline';
+export type { AgentSnapshot, FleetSnapshot, SupervisorReview, SupervisorAnswer } from './intelligence/supervisor';
+export { reviewFleet, askSupervisor } from './intelligence/supervisor';
 
 export default Watchdog;

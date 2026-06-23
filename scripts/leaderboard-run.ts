@@ -46,6 +46,6 @@ function mk(agentId: string): Watchdog {
   d.reportTradeClosed({ symbol: 'BTCUSDT', pnlUsdt: -50 });
 
   // pick any agent as the primary for /api/status — leaderboard endpoint reads the fleet registry, so all 4 will appear
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
   await createDashboardServer(a, port);
 })();

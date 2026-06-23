@@ -38,7 +38,7 @@ function banner(s: string) {
   banner('WATCHDOG demo-agent — well-behaved baseline');
 
   const w = new Watchdog(cfg);
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
   await createDashboardServer(w, port);
 
   console.log(`\nopen the dashboard:  http://localhost:${port}`);

@@ -37,7 +37,7 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 (async () => {
   clear();
   const w = new Watchdog(cfg);
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
   await createDashboardServer(w, port);
 
   console.log(`\ndashboard up at http://localhost:${port}`);

@@ -125,6 +125,20 @@ export function createDashboardServer(watchdog: Watchdog, port: number): Promise
     res.json(buildLedger(watchdog));
   });
 
+  app.use(express.json());
+
+  // LAYER 6 — the AI behavioral supervisor
+  app.get('/api/supervisor', async (_req: Request, res: Response) => {
+    try { res.json(await Watchdog.reviewFleet()); }
+    catch (e) { res.status(500).json({ error: (e as Error).message }); }
+  });
+  app.post('/api/supervisor/ask', async (req: Request, res: Response) => {
+    const q = (req.body && typeof req.body.question === 'string') ? req.body.question : '';
+    if (!q.trim()) return res.status(400).json({ error: 'question required' });
+    try { res.json(await Watchdog.askSupervisor(q)); }
+    catch (e) { res.status(500).json({ error: (e as Error).message }); }
+  });
+
   app.get('/api/leaderboard', (_req: Request, res: Response) => {
     res.json(Watchdog.getLeaderboard());
   });

@@ -81,7 +81,7 @@ async function main() {
   // silence the engine's internal violation warnings — the captioned banners
   // tell the story; raw [WATCHDOG] log lines would clutter the recording.
   console.warn = () => {};
-  const port = Number(process.env.WATCHDOG_PORT) || 3000;
+  const port = Number(process.env.PORT || process.env.WATCHDOG_PORT) || 3000;
 
   console.clear();
   console.log(`${C.teal}${C.bold}
