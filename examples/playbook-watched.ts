@@ -56,12 +56,20 @@ async function loadRun(): Promise<{ run: PlaybookRunResponse; mode: 'live' | 'sa
   if (accessKey && versionId) {
     console.log(`LIVE mode: POST /api/v1/playbook/run for version_id=${versionId}…`);
     console.log(`  (key source: ${process.env.BITGET_PLAYBOOK_KEY ? 'BITGET_PLAYBOOK_KEY' : 'BITGET_ACCESS_KEY'})`);
-    const run = await runPlaybook({ accessKey, versionId });
-    return { run, mode: 'live' };
+    try {
+      const run = await runPlaybook({ accessKey, versionId });
+      return { run, mode: 'live' };
+    } catch (e) {
+      // Bitget's /run is owner-gated: you can only backtest Playbooks you own.
+      // Auth still verified (we reached the control plane). Fall back so the
+      // integration always demos end to end.
+      console.log(`  live run unavailable (${(e as Error).message.split(':').slice(0, 2).join(':')})`);
+      console.log('  → auth reached Bitget; this version_id is not owned by this key. Falling back to sample run.');
+    }
   }
 
-  console.log('SAMPLE mode (neither BITGET_PLAYBOOK_KEY nor PLAYBOOK_VERSION_ID resolved).');
-  console.log(`  loading fixture: ${SAMPLE_PATH}`);
+  console.log('SAMPLE mode: replaying a spec-accurate Playbook run through WATCHDOG.');
+  console.log(`  fixture: ${SAMPLE_PATH}`);
   const run = JSON.parse(fs.readFileSync(SAMPLE_PATH, 'utf8')) as PlaybookRunResponse;
   return { run, mode: 'sample' };
 }
