@@ -260,3 +260,45 @@ tbody tr:hover{background:rgba(255,255,255,0.018);}
   box-shadow:inset 0 0 0 1px rgba(255,255,255,0.06);
 }
 .av svg{display:block;width:100%;height:100%;}
+
+/* ── sidebar credibility block ── */
+.cred{display:flex;flex-direction:column;gap:7px;}
+.cred a{display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;font-size:11.5px;color:var(--muted);transition:.18s;}
+.cred a:hover{color:var(--text);border-color:var(--line-2);}
+.cred a svg{width:14px;height:14px;flex:0 0 auto;}
+.cred .badges{display:flex;gap:6px;flex-wrap:wrap;}
+.cred .badge-pill{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.02em;padding:3px 7px;border-radius:6px;background:rgba(58,217,160,0.10);color:var(--green);border:1px solid rgba(58,217,160,0.22);}
+
+/* ── MOBILE: the scaled desktop stage flows to a real responsive layout ── */
+@media (max-width:900px){
+  body{overflow:auto;display:block;align-items:initial;}
+  #stage{position:static;width:100%;height:auto;transform:none!important;}
+  #app{position:static;display:flex;flex-direction:column;min-height:100vh;}
+  .sidebar{
+    flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;
+    height:auto;padding:12px 16px;border-right:none;border-bottom:1px solid var(--line);
+  }
+  .sidebar .brand{padding:0;}
+  .sidebar .brand-tag{display:none;}
+  .nav{flex-direction:row;flex-wrap:wrap;gap:4px;margin-top:0;margin-left:auto;}
+  .nav-label{display:none;}
+  .nav-item{padding:8px 12px;}
+  .nav-item.active::before{display:none;}
+  .sidebar-foot{display:none;}            /* sdk card + credibility hidden on small screens */
+  .main{min-width:0;}
+  .topbar{height:auto;flex-wrap:wrap;gap:8px;padding:14px 18px;}
+  .topbar h1{font-size:22px;}
+  .canvas{height:auto!important;padding:18px;gap:16px;}
+  .stats,.stats.cols-6{grid-template-columns:repeat(2,1fr);}
+  .grid{grid-template-columns:1fr!important;height:auto!important;}
+  .rcol{min-height:0;}
+  .panel{min-height:0;}
+  .scroll{overflow:auto;-webkit-overflow-scrolling:touch;}
+  .footnote{position:static;text-align:center;padding:14px;}
+  /* tables scroll horizontally instead of crushing */
+  .panel table{min-width:560px;}
+  .scroll{overflow-x:auto;}
+}
+@media (max-width:520px){
+  .stats,.stats.cols-6{grid-template-columns:1fr;}
+}

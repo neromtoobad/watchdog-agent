@@ -63,4 +63,4 @@ Every scenario is seeded with a fixed PRNG, so the same machine produces the sam
 - Mean time-to-detection counts every input call (open, close, signal) — not just opens. A frequency violation at the 11th `checkTrade` shows as step 11.
 - The control agent runs a small mix of aligned wins/losses across 4 trades; any non-zero `violations fired` would be a false positive.
 
-<sub>Generated 2026-06-07T06:54:38.035Z</sub>
+<sub>Generated 2026-06-07T07:19:17.627Z</sub>

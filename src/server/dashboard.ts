@@ -145,8 +145,14 @@ export function createDashboardServer(watchdog: Watchdog, port: number): Promise
     res.send(svg);
   });
 
-  // serve dashboard html
-  app.use(express.static(path.resolve(__dirname, '..', '..', 'public')));
+  // clean route for the dashboard: /app → app.html (/, the landing page, is static)
+  const publicDir = path.resolve(__dirname, '..', '..', 'public');
+  app.get('/app', (_req: Request, res: Response) => {
+    res.sendFile(path.join(publicDir, 'app.html'));
+  });
+
+  // serve landing page + dashboard html + assets
+  app.use(express.static(publicDir));
 
   return new Promise<DashboardServer>((resolve, reject) => {
     const server = app.listen(port, () => {
