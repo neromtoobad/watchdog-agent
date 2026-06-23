@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WATCHDOG — Fleet Leaderboard</title>
+<title>WATCHDOG · Fleet Leaderboard</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
 <link rel="stylesheet" href="/assets/watchdog.css" />
 <script src="/assets/avatar.js"></script>
@@ -69,22 +69,22 @@
         <div class="stats">
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/></svg>Agents Tracked</div>
-            <div class="val mono" id="stat-total">—</div>
+            <div class="val mono" id="stat-total">-</div>
             <div class="delta up"><span>fleet registry</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Avg Trust</div>
-            <div class="val mono" id="stat-avg">—<small>/100</small></div>
+            <div class="val mono" id="stat-avg">-<small>/100</small></div>
             <div class="delta warn"><span>weighted EMA</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z"/><path d="M8 12l3 3 5-6"/></svg>Healthy · Caution · Unsafe</div>
-            <div class="val mono" id="stat-bands">—</div>
+            <div class="val mono" id="stat-bands">-</div>
             <div class="delta warn"><span>by band</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.6 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/></svg>Total Incidents</div>
-            <div class="val mono" id="stat-incidents">—</div>
+            <div class="val mono" id="stat-incidents">-</div>
             <div class="delta down"><span>across fleet</span></div>
           </div>
         </div>
@@ -101,7 +101,7 @@
                 <th class="left">#</th><th class="left">Agent</th><th>Trust Score</th><th>Trend</th><th>Trades</th><th>Incidents</th><th>Status</th>
               </tr></thead>
               <tbody id="board-body">
-                <tr class="empty-row"><td colspan="7">no agents registered — start a watchdog with fleet.register=true</td></tr>
+                <tr class="empty-row"><td colspan="7">no agents registered · start a watchdog with fleet.register=true</td></tr>
               </tbody>
             </table>
           </div>
@@ -130,9 +130,9 @@ function renderSummary(profiles){
   const total=profiles.length;
   document.getElementById('stat-total').textContent=String(total);
   if(total===0){
-    document.getElementById('stat-avg').innerHTML='—<small>/100</small>';
-    document.getElementById('stat-bands').innerHTML='—';
-    document.getElementById('stat-incidents').textContent='—';
+    document.getElementById('stat-avg').innerHTML='-<small>/100</small>';
+    document.getElementById('stat-bands').innerHTML='-';
+    document.getElementById('stat-incidents').textContent='-';
     return;
   }
   const avg=Math.round(profiles.reduce((a,p)=>a+(p.trustScore||0),0)/total);
@@ -148,13 +148,13 @@ function renderSummary(profiles){
 function renderBoard(profiles){
   const body=document.getElementById('board-body');
   if(!Array.isArray(profiles)||profiles.length===0){
-    body.innerHTML='<tr class="empty-row"><td colspan="7">no agents registered — start a watchdog with fleet.register=true</td></tr>';
+    body.innerHTML='<tr class="empty-row"><td colspan="7">no agents registered · start a watchdog with fleet.register=true</td></tr>';
     return;
   }
   body.innerHTML=profiles.map((p,i)=>{
     const score=Math.max(0,Math.min(100,Math.round(p.trustScore||0)));
     const st=statusFor(p.band);
-    const trend=p.trend==='up'?'▲ rising':p.trend==='down'?'▼ falling':'— stable';
+    const trend=p.trend==='up'?'▲ rising':p.trend==='down'?'▼ falling':'- stable';
     const trendC=p.trend==='up'?'var(--green)':p.trend==='down'?'var(--red)':'var(--muted-2)';
     const rank=i===0?'★ 1':String(i+1).padStart(2,'0');
     const rankC=i===0?'color:var(--accent);font-weight:700;':'';

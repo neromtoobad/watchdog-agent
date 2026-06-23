@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WATCHDOG — Trade Ledger</title>
+<title>WATCHDOG · Trade Ledger</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
 <link rel="stylesheet" href="/assets/watchdog.css" />
 <style>
@@ -72,8 +72,8 @@
           <div class="sub">reconstructed FIFO-per-symbol from the live event stream</div>
         </div>
         <div class="right">
-          <span class="pill" id="agent-pill">agent · —</span>
-          <span class="pill" id="trust-pill">trust —</span>
+          <span class="pill" id="agent-pill">agent · -</span>
+          <span class="pill" id="trust-pill">trust -</span>
           <div class="updated" id="updated">connecting…</div>
         </div>
       </header>
@@ -82,32 +82,32 @@
         <div class="stats cols-6">
           <div class="stat rv">
             <div class="lbl">Start equity</div>
-            <div class="val mono" id="stat-start">—</div>
+            <div class="val mono" id="stat-start">-</div>
             <div class="delta warn"><span>USDT</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl">Current equity</div>
-            <div class="val mono" id="stat-equity">—</div>
+            <div class="val mono" id="stat-equity">-</div>
             <div class="delta warn" id="stat-equity-sub"><span>vs start</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl">Net P&L</div>
-            <div class="val mono" id="stat-pnl">—</div>
-            <div class="delta warn" id="stat-pnl-pct"><span>—</span></div>
+            <div class="val mono" id="stat-pnl">-</div>
+            <div class="delta warn" id="stat-pnl-pct"><span>-</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl">Trades</div>
-            <div class="val mono" id="stat-trades">—</div>
-            <div class="delta warn" id="stat-open"><span>— open</span></div>
+            <div class="val mono" id="stat-trades">-</div>
+            <div class="delta warn" id="stat-open"><span>- open</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl">Win rate</div>
-            <div class="val mono" id="stat-wr">—</div>
-            <div class="delta warn" id="stat-wr-sub"><span>— W / — L</span></div>
+            <div class="val mono" id="stat-wr">-</div>
+            <div class="delta warn" id="stat-wr-sub"><span>- W / - L</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl">Profit factor</div>
-            <div class="val mono" id="stat-pf">—</div>
+            <div class="val mono" id="stat-pf">-</div>
             <div class="delta warn" id="stat-pf-sub"><span>avg W / avg L</span></div>
           </div>
         </div>
@@ -126,7 +126,7 @@
                 <th>Size</th><th>P&amp;L</th><th>Return</th><th>Equity</th><th class="left">Result</th>
               </tr></thead>
               <tbody id="ledger-body">
-                <tr class="empty-row"><td colspan="10">no trades yet — run an agent demo to populate</td></tr>
+                <tr class="empty-row"><td colspan="10">no trades yet · run an agent demo to populate</td></tr>
               </tbody>
             </table>
           </div>
@@ -146,8 +146,8 @@
 
 const POLL_MS=2000;
 const fmtTime=(ts)=>{const d=new Date(ts);return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');};
-const fmtUsd=(n,sign=false)=>{if(n===null||n===undefined) return '—'; return (sign&&n>0?'+':'')+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
-const fmtPct=(n)=>n===null||n===undefined?'—':`${n>=0?'+':''}${n.toFixed(2)}%`;
+const fmtUsd=(n,sign=false)=>{if(n===null||n===undefined) return '-'; return (sign&&n>0?'+':'')+n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});};
+const fmtPct=(n)=>n===null||n===undefined?'-':`${n>=0?'+':''}${n.toFixed(2)}%`;
 const cls=(n)=>n>0?'pos':n<0?'neg':'warn';
 const escapeHtml=(s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function hhmmss(d=new Date()){return [d.getHours(),d.getMinutes(),d.getSeconds()].map(n=>String(n).padStart(2,'0')).join(':');}
@@ -155,7 +155,7 @@ function hhmmss(d=new Date()){return [d.getHours(),d.getMinutes(),d.getSeconds()
 function renderTable(trades,openCount){
   const body=document.getElementById('ledger-body');
   if(!trades.length&&!openCount){
-    body.innerHTML='<tr class="empty-row"><td colspan="10">no trades yet — run an agent demo to populate</td></tr>';
+    body.innerHTML='<tr class="empty-row"><td colspan="10">no trades yet · run an agent demo to populate</td></tr>';
     return;
   }
   const rows=trades.slice().reverse().map((t,i)=>{
@@ -188,7 +188,7 @@ async function tick(){
     const s=ledger.summary;
     const trust=status.trustScore||{score:100,band:'healthy'};
 
-    document.getElementById('agent-pill').innerHTML=`<span class="dot"></span>agent · ${escapeHtml(ledger.agentId||'—')}`;
+    document.getElementById('agent-pill').innerHTML=`<span class="dot"></span>agent · ${escapeHtml(ledger.agentId||'-')}`;
     const tp=document.getElementById('trust-pill');
     tp.innerHTML=`<span class="dot"></span>trust ${trust.score} · ${trust.band}`;
     tp.className='pill '+(trust.band==='healthy'?'ok':trust.band==='caution'?'warn':'bad');
@@ -206,9 +206,9 @@ async function tick(){
 
     document.getElementById('stat-trades').textContent=String(s.totalTrades);
     document.getElementById('stat-open').innerHTML=`<span>${s.openPositions} open</span>`;
-    document.getElementById('stat-wr').textContent=s.totalTrades?`${Math.round(s.winRate*100)}%`:'—';
+    document.getElementById('stat-wr').textContent=s.totalTrades?`${Math.round(s.winRate*100)}%`:'-';
     document.getElementById('stat-wr-sub').innerHTML=`<span>${s.wins} W / ${s.losses} L</span>`;
-    document.getElementById('stat-pf').textContent=s.totalTrades?(s.profitFactor===null?'∞':s.profitFactor.toFixed(2)):'—';
+    document.getElementById('stat-pf').textContent=s.totalTrades?(s.profitFactor===null?'∞':s.profitFactor.toFixed(2)):'-';
     document.getElementById('stat-pf-sub').innerHTML=`<span>avg W ${fmtUsd(s.avgWin)} · avg L ${fmtUsd(s.avgLoss)}</span>`;
 
     renderTable(ledger.trades,s.openPositions);

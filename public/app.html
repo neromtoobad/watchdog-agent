@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WATCHDOG — Behavioral Monitor</title>
+<title>WATCHDOG · Behavioral Monitor</title>
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
 <link rel="stylesheet" href="/assets/watchdog.css" />
 <script src="/assets/avatar.js"></script>
@@ -158,7 +158,7 @@
       <header class="topbar">
         <div>
           <h1>Overview</h1>
-          <div class="sub" id="topbar-sub">Behavioral credit scoring · — agents under watch</div>
+          <div class="sub" id="topbar-sub">Behavioral credit scoring · · agents under watch</div>
         </div>
         <div class="right">
           <div class="updated" id="updated">connecting…</div>
@@ -174,22 +174,22 @@
         <div class="stats">
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Agents Monitored</div>
-            <div class="val mono" id="stat-agents">—</div>
+            <div class="val mono" id="stat-agents">-</div>
             <div class="delta up"><span>via fleet registry</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Avg Trust Score</div>
-            <div class="val mono" id="stat-avg">—<small>/100</small></div>
+            <div class="val mono" id="stat-avg">-<small>/100</small></div>
             <div class="delta warn"><span>across fleet</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10.3 3.6 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0z"/></svg>Incidents</div>
-            <div class="val mono" id="stat-inc">—</div>
+            <div class="val mono" id="stat-inc">-</div>
             <div class="delta warn"><span>fleet total</span></div>
           </div>
           <div class="stat rv">
             <div class="lbl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>Auto-Paused</div>
-            <div class="val mono" id="stat-paused">—</div>
+            <div class="val mono" id="stat-paused">-</div>
             <div class="delta warn"><span>unsafe band</span></div>
           </div>
         </div>
@@ -222,7 +222,7 @@
                 <div class="mon-head">
                   <div class="av" id="mon-av" style="background:linear-gradient(135deg,#2ee6cf,#0f8f82)">·</div>
                   <div>
-                    <div class="nm" id="mon-nm">—</div>
+                    <div class="nm" id="mon-nm">-</div>
                     <div class="by" id="mon-by">/api/status</div>
                   </div>
                 </div>
@@ -231,7 +231,7 @@
               <div class="mon-body">
                 <div class="spark-wrap">
                   <div class="spark-score">
-                    <div class="big mono" id="liveScore">—</div>
+                    <div class="big mono" id="liveScore">-</div>
                     <div class="cap">live trust score</div>
                   </div>
                   <svg class="spark" id="spark" viewBox="0 0 160 56" preserveAspectRatio="none">
@@ -249,22 +249,22 @@
               </div>
               <div class="inc-empty">
                 <div class="ring"></div>
-                <div class="t">All clear — scanning</div>
+                <div class="t">All clear · scanning</div>
                 <div class="s">WATCHDOG fires an explained report the instant an agent breaches a safe threshold.</div>
               </div>
               <div class="inc-body">
                 <div class="inc-row">
                   <span class="sev" id="incSev">CRITICAL</span>
                   <span class="inc-id" id="incId">INCIDENT</span>
-                  <span class="inc-time" id="incTime">—</span>
+                  <span class="inc-time" id="incTime">-</span>
                 </div>
-                <div class="inc-title" id="incTitle">—</div>
+                <div class="inc-title" id="incTitle">-</div>
                 <div class="inc-ai">
-                  <div id="incSummary">—</div>
+                  <div id="incSummary">-</div>
                   <span class="field-label">Likely cause</span>
-                  <div id="incCause">—</div>
+                  <div id="incCause">-</div>
                   <span class="field-label">Recommendation</span>
-                  <div id="incRec">—</div>
+                  <div id="incRec">-</div>
                 </div>
                 <div class="inc-foot">
                   <a href="/leaderboard.html" class="btn">View fleet</a>
@@ -283,17 +283,17 @@
           </div>
         </div>
 
-        <!-- LAYER 6 — AI RISK OFFICER -->
+        <!-- LAYER 6 · AI RISK OFFICER -->
         <div class="panel rv" id="risk-officer">
           <div class="panel-head">
-            <h2>AI Risk Officer <span class="it">— reasons over the whole fleet</span></h2>
+            <h2>AI Risk Officer <span class="it">- reasons over the whole fleet</span></h2>
             <span class="ai-tag" id="sup-source"><span class="d"></span>supervisor</span>
           </div>
           <div class="ro-body">
             <div class="ro-grid">
               <div class="ro-card">
                 <div class="ro-label">Top risk</div>
-                <div class="ro-val" id="ro-toprisk">—</div>
+                <div class="ro-val" id="ro-toprisk">-</div>
                 <div class="ro-sub" id="ro-toprisk-why"></div>
               </div>
               <div class="ro-card">
@@ -302,7 +302,7 @@
               </div>
               <div class="ro-card">
                 <div class="ro-label">Fleet assessment</div>
-                <div class="ro-sub" id="ro-fleet">—</div>
+                <div class="ro-sub" id="ro-fleet">-</div>
               </div>
             </div>
             <div class="ro-ask">
@@ -337,13 +337,13 @@ function hhmmss(d=new Date()){return [d.getHours(),d.getMinutes(),d.getSeconds()
 const lbBody=document.getElementById('lbBody');
 function renderLeaderboard(profiles){
   if(!Array.isArray(profiles)||profiles.length===0){
-    lbBody.innerHTML='<tr class="empty-row"><td colspan="6">no agents registered — start a watchdog with fleet.register=true</td></tr>';
+    lbBody.innerHTML='<tr class="empty-row"><td colspan="6">no agents registered · start a watchdog with fleet.register=true</td></tr>';
     return;
   }
   lbBody.innerHTML=profiles.map((p,i)=>{
     const score=Math.max(0,Math.min(100,Math.round(p.trustScore||0)));
     const st=statusFor(p.band);
-    const trend=p.trend==='up'?'▲':p.trend==='down'?'▼':'—';
+    const trend=p.trend==='up'?'▲':p.trend==='down'?'▼':'-';
     const trendC=p.trend==='up'?'var(--green)':p.trend==='down'?'var(--red)':'var(--muted-2)';
     return `<tr>
       <td class="rank">${String(i+1).padStart(2,'0')}</td>
@@ -379,13 +379,13 @@ const liveScoreEl=document.getElementById('liveScore'), sparkEl=document.getElem
 const monAv=document.getElementById('mon-av'), monNm=document.getElementById('mon-nm'), monBy=document.getElementById('mon-by'), monChip=document.getElementById('mon-chip');
 const scoreHistory=[];
 function renderMonitor(status){
-  const agentId=status?.agentId||'—';
+  const agentId=status?.agentId||'-';
   const trust=status?.trustScore||{score:100,band:'healthy'};
   const color=scoreColor(trust.score||0);
   monAv.innerHTML=WD.agentAvatar(agentId);
   monNm.textContent=agentId;
   monBy.textContent=`${trust.band} · trend ${trust.trend||'flat'}`;
-  liveScoreEl.textContent=trust.score??'—';
+  liveScoreEl.textContent=trust.score??'-';
   liveScoreEl.style.color=color;
   if(status?.paused){
     monChip.className='chip';
@@ -439,10 +439,10 @@ function renderIncident(diag,agentId){
   document.getElementById('incSev').textContent=diag.source==='ai'?'CRITICAL':'TEMPLATED';
   document.getElementById('incId').textContent=`INCIDENT · ${diag.source}`;
   document.getElementById('incTime').textContent=hhmmss(new Date(diag.timestamp||Date.now()))+' UTC';
-  document.getElementById('incTitle').textContent=`${agentId} — auto-paused`;
-  document.getElementById('incSummary').textContent=diag.summary||'—';
-  document.getElementById('incCause').textContent=diag.likelyCause||'—';
-  document.getElementById('incRec').textContent=diag.recommendation||'—';
+  document.getElementById('incTitle').textContent=`${agentId} · auto-paused`;
+  document.getElementById('incSummary').textContent=diag.summary||'-';
+  document.getElementById('incCause').textContent=diag.likelyCause||'-';
+  document.getElementById('incRec').textContent=diag.recommendation||'-';
 }
 
 const feed=document.getElementById('feed');
@@ -508,14 +508,14 @@ async function tickSupervisor(){
       document.getElementById('ro-toprisk').textContent=r.topRisk.agentId;
       document.getElementById('ro-toprisk-why').textContent=r.topRisk.reason||'';
     } else {
-      document.getElementById('ro-toprisk').textContent='—';
+      document.getElementById('ro-toprisk').textContent='-';
       document.getElementById('ro-toprisk-why').textContent='no agents under watch';
     }
     const wl=document.getElementById('ro-warnings');
     if(r.earlyWarnings&&r.earlyWarnings.length){
-      wl.innerHTML=r.earlyWarnings.slice(0,4).map(w=>`<div class="ro-warn"><span class="b">⚡</span><span><span class="a">${escapeHtml(w.agentId)}</span> — ${escapeHtml(w.signal)}</span></div>`).join('');
-    } else { wl.innerHTML='<div class="ro-sub">none — all agents within their normal behavior</div>'; }
-    document.getElementById('ro-fleet').textContent=r.fleetAssessment||'—';
+      wl.innerHTML=r.earlyWarnings.slice(0,4).map(w=>`<div class="ro-warn"><span class="b">⚡</span><span><span class="a">${escapeHtml(w.agentId)}</span> · ${escapeHtml(w.signal)}</span></div>`).join('');
+    } else { wl.innerHTML='<div class="ro-sub">none · all agents within their normal behavior</div>'; }
+    document.getElementById('ro-fleet').textContent=r.fleetAssessment||'-';
   }catch(e){}
 }
 async function askRiskOfficer(){

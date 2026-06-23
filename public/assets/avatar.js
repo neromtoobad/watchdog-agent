@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────
-   WATCHDOG — agent avatar generator
+   WATCHDOG · agent avatar generator
    Deterministic SVG mark per agent name: gradient orb + glyph.
    No external dependencies. Each agent gets one of 8 colors × 8 glyphs.
    ──────────────────────────────────────────────────────────────────── */
@@ -44,7 +44,7 @@
 
   /**
    * Generate inline SVG markup for an agent.
-   * @param {string} name — agent identifier
+   * @param {string} name · agent identifier
    * @returns {string} SVG markup
    */
   function agentAvatar(name) {

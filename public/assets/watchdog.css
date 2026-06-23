@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────
-   WATCHDOG — shared design system
+   WATCHDOG · shared design system
    ──────────────────────────────────────────────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -78,7 +78,7 @@ a{text-decoration:none;color:inherit;}
   filter:hue-rotate(-15deg) saturate(0.7) contrast(1.04);
 }
 
-/* dark overlay — a single subtle wash, no neon blob */
+/* dark overlay · a single subtle wash, no neon blob */
 #app::before{
   content:"";
   position:absolute;inset:0;
