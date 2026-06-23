@@ -20,8 +20,14 @@ and renders embeddable trust badges: a verifiable reputation layer for agents.
 
 Every claim is proven. A deterministic chaos harness fires ten misbehavior
 classes; WATCHDOG catches them with a reproducible benchmark (100% detection,
-0% false positives, 8.44 mean time-to-detection). 165 tests pass. A
+0% false positives, 8.44 mean time-to-detection). 192 tests pass. A
 hash-chained audit trail makes every decision tamper-evident.
+
+Where competing risk tools are single-agent firewalls that block one trade,
+WATCHDOG is the reputation layer for the whole fleet: each such filter is one
+of WATCHDOG's five guards. Model-agnostic AI: runs on Alibaba Qwen (DashScope)
+or Claude. Exposed as a Model Context Protocol server, so any MCP agent gates
+trades through it with zero code.
 
 Bitget modules used: bgc spot + futures (read-only public market data via Agent
 Hub), and the GetAgent Playbook control plane — pipe any backtest through

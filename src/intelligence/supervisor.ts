@@ -17,7 +17,7 @@
  * This is the part only an AI agent can do. Without an API key it degrades to a
  * heuristic review built from the σ-baselines, so the demo never breaks.
  */
-import * as https from 'https';
+import { callLLM } from './llm';
 import type { FleetProfile } from '../index';
 import type { MetricBaseline } from './baseline';
 
@@ -82,26 +82,6 @@ function snapshotToText(s: FleetSnapshot): string {
   return lines.join('\n');
 }
 
-function postLLM(apiKey: string, model: string, system: string, user: string, maxTokens = 700): Promise<string> {
-  const body = JSON.stringify({ model, max_tokens: maxTokens, system, messages: [{ role: 'user', content: user }] });
-  return new Promise((resolve, reject) => {
-    const req = https.request({
-      hostname: 'api.anthropic.com', path: '/v1/messages', method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01', 'content-length': Buffer.byteLength(body) },
-      timeout: 20_000,
-    }, (res) => {
-      let raw = ''; res.on('data', (c) => (raw += c));
-      res.on('end', () => (!res.statusCode || res.statusCode >= 400) ? reject(new Error(`anthropic ${res.statusCode}: ${raw}`)) : resolve(raw));
-    });
-    req.on('error', reject);
-    req.on('timeout', () => req.destroy(new Error('supervisor timeout')));
-    req.write(body); req.end();
-  });
-}
-function llmText(raw: string): string {
-  const parsed = JSON.parse(raw) as { content?: { type: string; text: string }[] };
-  return parsed.content?.find((c) => c.type === 'text')?.text ?? '';
-}
 function extractJson<T>(text: string): T | null {
   const s = text.indexOf('{'), e = text.lastIndexOf('}');
   if (s < 0 || e <= s) return null;
@@ -145,7 +125,7 @@ export async function reviewFleet(snapshot: FleetSnapshot, opts: SupervisorOpts 
   ].join('\n');
 
   try {
-    const json = extractJson<Omit<SupervisorReview, 'source' | 'timestamp'>>(llmText(await postLLM(apiKey, model, SYSTEM, user)));
+    const json = extractJson<Omit<SupervisorReview, 'source' | 'timestamp'>>(await callLLM({ system: SYSTEM, user, apiKey, model, maxTokens: 700 }));
     if (!json || !Array.isArray(json.earlyWarnings)) return heuristicReview(snapshot);
     return { source: 'ai', timestamp: Date.now(), topRisk: json.topRisk ?? null, earlyWarnings: json.earlyWarnings, fleetAssessment: json.fleetAssessment ?? '' };
   } catch {
@@ -165,7 +145,7 @@ export async function askSupervisor(question: string, snapshot: FleetSnapshot, o
   }
   const user = `${snapshotToText(snapshot)}\n\nQUESTION: ${question}\n\nAnswer concisely in plain language, citing specific agents, σ-deviations, or metrics. Behavior only, not market predictions.`;
   try {
-    const answer = llmText(await postLLM(apiKey, model, SYSTEM, user, 500)).trim();
+    const answer = (await callLLM({ system: SYSTEM, user, apiKey, model, maxTokens: 500 })).trim();
     return { source: 'ai', answer: answer || '(no answer)' };
   } catch (e) {
     return { source: 'heuristic', answer: `Supervisor unavailable (${(e as Error).message}). Falling back to metrics: ${heuristicReview(snapshot).fleetAssessment}` };

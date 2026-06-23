@@ -1,4 +1,4 @@
-import * as https from 'https';
+import { callLLM } from './llm';
 import type { Diagnosis, MetricResult, WatchdogEvent } from '../index';
 import type { MarketContext } from '../market/context';
 
@@ -88,45 +88,6 @@ function fallbackDiagnosis(input: DiagnosisInput): Diagnosis {
   };
 }
 
-async function postAnthropic(apiKey: string, model: string, system: string, user: string): Promise<string> {
-  const body = JSON.stringify({
-    model,
-    max_tokens: 512,
-    system,
-    messages: [{ role: 'user', content: user }],
-  });
-  return new Promise<string>((resolve, reject) => {
-    const req = https.request(
-      {
-        hostname: 'api.anthropic.com',
-        path: '/v1/messages',
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'content-length': Buffer.byteLength(body),
-        },
-        timeout: 15_000,
-      },
-      (res) => {
-        let raw = '';
-        res.on('data', (c) => (raw += c));
-        res.on('end', () => {
-          if (!res.statusCode || res.statusCode >= 400) {
-            return reject(new Error(`anthropic ${res.statusCode}: ${raw}`));
-          }
-          resolve(raw);
-        });
-      },
-    );
-    req.on('error', reject);
-    req.on('timeout', () => req.destroy(new Error('anthropic request timeout')));
-    req.write(body);
-    req.end();
-  });
-}
-
 function extractJson(text: string): { summary: string; likelyCause: string; recommendation: string } | null {
   const start = text.indexOf('{');
   const end = text.lastIndexOf('}');
@@ -146,9 +107,7 @@ export async function generateDiagnosis(input: DiagnosisInput): Promise<Diagnosi
   if (!apiKey || !model) return fallbackDiagnosis(input);
 
   try {
-    const raw = await postAnthropic(apiKey, model, SYSTEM_PROMPT, buildUserPrompt(input));
-    const parsed = JSON.parse(raw) as { content?: Array<{ type: string; text: string }> };
-    const text = parsed.content?.find((c) => c.type === 'text')?.text ?? '';
+    const text = await callLLM({ system: SYSTEM_PROMPT, user: buildUserPrompt(input), apiKey, model, maxTokens: 512 });
     const json = extractJson(text);
     if (!json) return fallbackDiagnosis(input);
     return {

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="#tests"><img src="https://img.shields.io/badge/tests-165%2F165%20passing-3fb950" alt="tests"/></a>
+  <a href="#tests"><img src="https://img.shields.io/badge/tests-192%2F192%20passing-3fb950" alt="tests"/></a>
   <a href="#tests"><img src="https://img.shields.io/badge/coverage-92%25-3fb950" alt="coverage"/></a>
   <a href="BENCHMARK.md"><img src="https://img.shields.io/badge/chaos%20benchmark-10%2F10%20caught%20·%200%25%20FP-3fb950" alt="benchmark"/></a>
   <a href="#license"><img src="https://img.shields.io/badge/license-MIT-3fb950" alt="license"/></a>
@@ -168,7 +168,7 @@ cd watchdog-agent
 npm install
 
 # 1. unit + integration tests
-npm test                                    # 155/155, ~1s
+npm test                                    # 192/192, ~1s
 
 # 2. the chaos benchmark — writes BENCHMARK.md
 npm run benchmark
@@ -366,7 +366,7 @@ $ npm test
 ✓ test/watchdog-extras.test.ts             (6 tests)
 
 Test Files  19 passed (19)
-     Tests  165 passed (165)
+     Tests  192 passed (192)
   Duration  1.35s
 ```
 
