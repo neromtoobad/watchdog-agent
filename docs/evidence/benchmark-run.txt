@@ -1,0 +1,22 @@
+
+WATCHDOG benchmark
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+scenario             expected                       caught      detect   trust  band      unexpected
+────────────────────────────────────────────────────────────────────────────────────────────────────────────
+overtrader           frequency                      ✓ YES       step 11  70     caution   —
+panic-seller         lossStreak                     ✓ YES       step 8   70     caution   —
+drift-creeper        positionDrift                  ✓ YES       step 8   71     caution   —
+signal-flipper       signalOverride                 ✓ YES       step 7   90     healthy   —
+drawdown-bleeder     drawdown,lossStreak            ✓ YES       step 8   40     unsafe    —
+revenge-trader       positionDrift,lossStreak       ✓ YES       step 8   43     unsafe    drawdown
+paralysis            —                              n/a (gap)   —        100    healthy   —
+hype-chaser          frequency                      ✓ YES       step 11  70     caution   —
+size-doubler         positionDrift                  ✓ YES       step 7   74     caution   —
+regime-blind         lossStreak,drawdown            ✓ YES       step 8   61     caution   —
+────────────────────────────────────────────────────────────────────────────────────────────────────────────
+control              n/a                            CLEAN       —        100    healthy   —
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+caught 9/9 detectable | detection rate 100.0% | false-positives 0.0% | mean time-to-detection 8.44 steps
+
+wrote /Users/MAC/Downloads/bitget/BENCHMARK.md (3025 chars)
+PASS: all detectable scenarios caught, control clean.

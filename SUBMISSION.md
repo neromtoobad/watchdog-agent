@@ -3,7 +3,7 @@
 **Project:** WATCHDOG — a behavioral intelligence layer for autonomous trading agents.
 **Track:** Track 2 — Trading Infra · Bitget AI Base Camp Hackathon S1
 **Repo:** https://github.com/neromtoobad/watchdog-agent
-**Live demo:** https://bitget-indol.vercel.app/app
+**Live demo:** https://watchdog-bitget.vercel.app/app
 **License:** MIT
 
 ## Project description (≤200 words · 195 words)
@@ -33,9 +33,17 @@ Playbook. Three lines to integrate. No black boxes.
 
 ## Verifiable usage records
 
-- **Reproducible benchmark** — [BENCHMARK.md](BENCHMARK.md): 10/10 misbehavior
-  classes caught, 0% false positives, 8.44 mean trades-to-detection.
-  Regenerate with `npm run benchmark`.
+**Start here → [VERIFICATION.md](VERIFICATION.md)** — every headline claim mapped to
+the command that reproduces it and the captured output committed in the repo.
+
+- **Full benchmark run (captured)** — [docs/evidence/benchmark-run.txt](docs/evidence/benchmark-run.txt):
+  per-scenario detection table. Summary in [BENCHMARK.md](BENCHMARK.md). 10/10
+  caught, 0% false positives, 8.44 mean trades-to-detection. (`npm run benchmark`)
+- **Tamper-evidence demo** — [docs/evidence/audit-tamper-demo.txt](docs/evidence/audit-tamper-demo.txt)
+  + [audit-trail.json](docs/evidence/audit-trail.json): rewriting a past audit
+  entry is detected immediately (valid=false, brokenAt=2).
+- **Live API snapshot (deployed site)** — [docs/evidence/live-api-snapshot.json](docs/evidence/live-api-snapshot.json):
+  timestamped real responses from the production endpoints.
 - **Test-run log** — [docs/sample-outputs/test-run.txt](docs/sample-outputs/test-run.txt):
   192/192 tests passing. Reproduce with `npm test`.
 - **Core sample input/output** — [docs/sample-outputs/checktrade-sample.json](docs/sample-outputs/checktrade-sample.json):
@@ -44,13 +52,13 @@ Playbook. Three lines to integrate. No black boxes.
   and [ai-sample.json](docs/sample-outputs/ai-sample.json).
 - **Live Bitget market data (read-only)** — [ticker-sample.json](docs/sample-outputs/ticker-sample.json),
   [funding-sample.json](docs/sample-outputs/funding-sample.json); live at
-  https://bitget-indol.vercel.app/api/market
+  https://watchdog-bitget.vercel.app/api/market
 - **Trust badges (SVG)** — [docs/sample-outputs/](docs/sample-outputs/); live at
-  https://bitget-indol.vercel.app/badge/charlie-bleeder
+  https://watchdog-bitget.vercel.app/badge/charlie-bleeder
 - **GetAgent Playbook run** — [playbook-run-sample.json](docs/sample-outputs/playbook-run-sample.json).
 
 ## Submission links
 
 - **GitHub:** https://github.com/neromtoobad/watchdog-agent
-- **Live deployment:** https://bitget-indol.vercel.app/app
-- **Live leaderboard:** https://bitget-indol.vercel.app/leaderboard.html
+- **Live deployment:** https://watchdog-bitget.vercel.app/app
+- **Live leaderboard:** https://watchdog-bitget.vercel.app/leaderboard.html

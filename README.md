@@ -17,9 +17,9 @@
 </p>
 
 <p align="center">
-  <a href="https://bitget-indol.vercel.app/app"><b>▶ Live dashboard</b></a> ·
-  <a href="https://bitget-indol.vercel.app/leaderboard.html">Fleet leaderboard</a> ·
-  <a href="https://bitget-indol.vercel.app/">Landing page</a>
+  <a href="https://watchdog-bitget.vercel.app/app"><b>▶ Live dashboard</b></a> ·
+  <a href="https://watchdog-bitget.vercel.app/leaderboard.html">Fleet leaderboard</a> ·
+  <a href="https://watchdog-bitget.vercel.app/">Landing page</a>
 </p>
 
 ---

@@ -1,0 +1,264 @@
+{
+  "verification": {
+    "valid": true,
+    "brokenAt": null
+  },
+  "trail": [
+    {
+      "index": 0,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 100,
+        "band": "healthy",
+        "trend": "flat"
+      },
+      "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "hash": "58d9ced9ad1f1035a608c1254bffe1ba186b509d3742df3fd43e11a02b7cced0"
+    },
+    {
+      "index": 1,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": true,
+          "reason": null,
+          "trustScore": 100,
+          "forecasts": [],
+          "action": null
+        }
+      },
+      "prevHash": "58d9ced9ad1f1035a608c1254bffe1ba186b509d3742df3fd43e11a02b7cced0",
+      "hash": "b38678753b795010b0844c3f69113ff341252c11173b442e1a91c9f44639b47e"
+    },
+    {
+      "index": 2,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 100,
+        "band": "healthy",
+        "trend": "flat"
+      },
+      "prevHash": "b38678753b795010b0844c3f69113ff341252c11173b442e1a91c9f44639b47e",
+      "hash": "f44aea8094a5a9198f86b121ca6f725090879878cf58d9bd92ec1adec6fa6e5a"
+    },
+    {
+      "index": 3,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": true,
+          "reason": null,
+          "trustScore": 100,
+          "forecasts": [],
+          "action": null
+        }
+      },
+      "prevHash": "f44aea8094a5a9198f86b121ca6f725090879878cf58d9bd92ec1adec6fa6e5a",
+      "hash": "53f7816556f6fc8dd16f96fa58189c5ae4d2fa1ef9e6b3bc68e55802f99b2d99"
+    },
+    {
+      "index": 4,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 100,
+        "band": "healthy",
+        "trend": "flat"
+      },
+      "prevHash": "53f7816556f6fc8dd16f96fa58189c5ae4d2fa1ef9e6b3bc68e55802f99b2d99",
+      "hash": "299a39ab3eb18839bd4b332bea8ab0f77b582b36842e438e0393c00c9e9178d4"
+    },
+    {
+      "index": 5,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": true,
+          "reason": null,
+          "trustScore": 100,
+          "forecasts": [
+            {
+              "metric": "frequency",
+              "projection": 5,
+              "breachInTrades": 2,
+              "detail": "frequency on track to breach 5 in ~2 trades (slope 1.000/sample)"
+            }
+          ],
+          "action": null
+        }
+      },
+      "prevHash": "299a39ab3eb18839bd4b332bea8ab0f77b582b36842e438e0393c00c9e9178d4",
+      "hash": "8710508033bde260652ccfc232f44bee5f6d4929a03b206fbaf7517755e8ad4b"
+    },
+    {
+      "index": 6,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 91,
+        "band": "healthy",
+        "trend": "down"
+      },
+      "prevHash": "8710508033bde260652ccfc232f44bee5f6d4929a03b206fbaf7517755e8ad4b",
+      "hash": "49d2a70395e3fa60fd1a5ccca3bd0e47a359c376e48a08b81793ff1370935f91"
+    },
+    {
+      "index": 7,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": true,
+          "reason": null,
+          "trustScore": 91,
+          "forecasts": [
+            {
+              "metric": "frequency",
+              "projection": 5,
+              "breachInTrades": 1,
+              "detail": "frequency on track to breach 5 in ~1 trade (slope 1.000/sample)"
+            }
+          ],
+          "action": null
+        }
+      },
+      "prevHash": "49d2a70395e3fa60fd1a5ccca3bd0e47a359c376e48a08b81793ff1370935f91",
+      "hash": "4c0d896afcee312e59663b7892a134d81a416e62e774eaab198e2aba87ab1d9d"
+    },
+    {
+      "index": 8,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 87,
+        "band": "healthy",
+        "trend": "down"
+      },
+      "prevHash": "4c0d896afcee312e59663b7892a134d81a416e62e774eaab198e2aba87ab1d9d",
+      "hash": "23e3883f75ce891f9ebed6f9648f77dbe3ed5b3eaa8ee961b607f72769018367"
+    },
+    {
+      "index": 9,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": true,
+          "reason": null,
+          "trustScore": 87,
+          "forecasts": [],
+          "action": null
+        }
+      },
+      "prevHash": "23e3883f75ce891f9ebed6f9648f77dbe3ed5b3eaa8ee961b607f72769018367",
+      "hash": "24174243d3e701c8f6d8c12f9d8641051e1bcfa3b565988ca31c4202b43d5980"
+    },
+    {
+      "index": 10,
+      "timestamp": 1782325263645,
+      "type": "violation",
+      "payload": {
+        "agentId": "audit-demo",
+        "violations": [
+          "frequency: 6 trades in last hour exceeds limit of 5"
+        ]
+      },
+      "prevHash": "24174243d3e701c8f6d8c12f9d8641051e1bcfa3b565988ca31c4202b43d5980",
+      "hash": "81c7da1323a3de6a4d3e8de9da5d5b011f84d402006c05b5a247c832655917f7"
+    },
+    {
+      "index": 11,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 77,
+        "band": "caution",
+        "trend": "down"
+      },
+      "prevHash": "81c7da1323a3de6a4d3e8de9da5d5b011f84d402006c05b5a247c832655917f7",
+      "hash": "e71baec9380612ebc810f356524c6ec2c6181510b47869f9c44b37823ca0dfff"
+    },
+    {
+      "index": 12,
+      "timestamp": 1782325263645,
+      "type": "decision",
+      "payload": {
+        "agentId": "audit-demo",
+        "request": {
+          "type": "open",
+          "symbol": "BTCUSDT",
+          "sizeUsdt": 100,
+          "direction": "long"
+        },
+        "decision": {
+          "approved": false,
+          "reason": "frequency: 6 trades in last hour exceeds limit of 5",
+          "trustScore": 77,
+          "forecasts": [],
+          "action": "pause"
+        }
+      },
+      "prevHash": "e71baec9380612ebc810f356524c6ec2c6181510b47869f9c44b37823ca0dfff",
+      "hash": "9699e8f6697c0c693da0d93e8b358179c24b4429e112dc7baedd68285e234305"
+    },
+    {
+      "index": 13,
+      "timestamp": 1782325263645,
+      "type": "trust-update",
+      "payload": {
+        "agentId": "audit-demo",
+        "score": 73,
+        "band": "caution",
+        "trend": "down"
+      },
+      "prevHash": "9699e8f6697c0c693da0d93e8b358179c24b4429e112dc7baedd68285e234305",
+      "hash": "c07c6150bbae3dc73ee3c8c56dc4febec6316664586cfd9064f041cff5923af0"
+    }
+  ]
+}

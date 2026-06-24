@@ -1,0 +1,25 @@
+WATCHDOG hash-chained audit trail — tamper-evidence demonstration
+================================================================
+
+chain length: 14 entries
+
+First 3 entries (each entry hashes prevHash + payload + timestamp):
+  [0] trust-update
+       prevHash: 000000000000000000000000...
+       hash:     cd41739ada6e64c39f3d138f...
+  [1] decision
+       prevHash: cd41739ada6e64c39f3d138f...
+       hash:     a8aff315682751080c972627...
+  [2] trust-update
+       prevHash: a8aff315682751080c972627...
+       hash:     b8325f944bbe4f0391b871a7...
+
+STEP 1 — verify intact chain:  valid=true  brokenAt=null
+
+STEP 2 — tamper with entry [2] (rewrite its payload, leave its hash unchanged):
+         was:  {"agentId":"audit-demo","score":100,"band":"healthy","trend":"flat"}
+         now:  {"agentId":"audit-demo","score":100,"band":"healthy","trend":"flat","sizeUsdt":999999,"tamperedField":"attacker-rewrote-history"}
+
+STEP 3 — re-verify tampered chain:  valid=false  brokenAt=2
+
+RESULT: PASS — tampering with entry [2] is detected immediately (brokenAt=2). Every decision is verifiable after the fact.

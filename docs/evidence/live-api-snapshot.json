@@ -1,0 +1,213 @@
+{
+  "_note": "Live API responses captured from the deployed WATCHDOG dashboard. Reproduce by curling the same endpoints.",
+  "_capturedAtUtc": "2026-06-24T18:21:15Z",
+  "_source": "https://watchdog-bitget.vercel.app",
+  "GET /api/leaderboard": [
+    {
+      "agentId": "alpha-control",
+      "trustScore": 100,
+      "band": "healthy",
+      "trend": "flat",
+      "totalTrades": 4,
+      "regimesSurvived": 0,
+      "incidents": 0,
+      "updatedAt": 1782325133138
+    },
+    {
+      "agentId": "delta-flipper",
+      "trustScore": 91,
+      "band": "healthy",
+      "trend": "down",
+      "totalTrades": 5,
+      "regimesSurvived": 0,
+      "incidents": 1,
+      "updatedAt": 1782325133142
+    },
+    {
+      "agentId": "echo-revenge",
+      "trustScore": 85,
+      "band": "healthy",
+      "trend": "flat",
+      "totalTrades": 6,
+      "regimesSurvived": 0,
+      "incidents": 1,
+      "updatedAt": 1782325133144
+    },
+    {
+      "agentId": "bravo-overtrader",
+      "trustScore": 70,
+      "band": "caution",
+      "trend": "flat",
+      "totalTrades": 16,
+      "regimesSurvived": 0,
+      "incidents": 1,
+      "updatedAt": 1782325133141
+    },
+    {
+      "agentId": "charlie-bleeder",
+      "trustScore": 42,
+      "band": "unsafe",
+      "trend": "down",
+      "totalTrades": 8,
+      "regimesSurvived": 0,
+      "incidents": 1,
+      "updatedAt": 1782325133150
+    }
+  ],
+  "GET /api/status": {
+    "agentId": "charlie-bleeder",
+    "paused": false,
+    "status": {
+      "agentId": "charlie-bleeder",
+      "paused": false,
+      "trustScore": {
+        "score": 42,
+        "band": "unsafe",
+        "trend": "down"
+      },
+      "metrics": {
+        "frequency": {
+          "name": "frequency",
+          "status": "warning",
+          "value": 8,
+          "threshold": 10,
+          "detail": "8/10 trades in last hour \u2014 approaching limit"
+        },
+        "positionDrift": {
+          "name": "positionDrift",
+          "status": "ok",
+          "value": 3.75,
+          "threshold": 25,
+          "detail": "avg position 3.75% of portfolio (limit 25%)"
+        },
+        "drawdown": {
+          "name": "drawdown",
+          "status": "violation",
+          "value": 18.6408,
+          "threshold": 15,
+          "detail": "drawdown 18.64% exceeds limit of 15%"
+        },
+        "lossStreak": {
+          "name": "lossStreak",
+          "status": "violation",
+          "value": 6,
+          "threshold": 4,
+          "detail": "6 consecutive losses meets/exceeds limit of 4"
+        },
+        "signalOverride": {
+          "name": "signalOverride",
+          "status": "ok",
+          "value": 0,
+          "threshold": 3,
+          "detail": "0/3 signal overrides in last hour"
+        }
+      }
+    },
+    "trustScore": {
+      "score": 42,
+      "band": "unsafe",
+      "trend": "down"
+    },
+    "forecasts": [
+      {
+        "metric": "frequency",
+        "projection": 10.1824,
+        "breachInTrades": 4,
+        "detail": "frequency on track to breach 10 in ~4 trades (slope 0.494/sample)"
+      }
+    ],
+    "lastDiagnosis": {
+      "timestamp": 1782325133662,
+      "summary": "Agent charlie-bleeder breached: lossStreak (4/4).",
+      "likelyCause": "broken strategy in this regime \u2014 losing trades stacking consecutively",
+      "recommendation": "pause strategy and review signal quality against current regime",
+      "source": "fallback",
+      "context": {
+        "metricStates": [
+          {
+            "name": "frequency",
+            "status": "ok",
+            "value": 6,
+            "threshold": 10,
+            "detail": "6/10 trades in last hour"
+          },
+          {
+            "name": "positionDrift",
+            "status": "ok",
+            "value": 3.6667,
+            "threshold": 25,
+            "detail": "avg position 3.67% of portfolio (limit 25%)"
+          },
+          {
+            "name": "drawdown",
+            "status": "warning",
+            "value": 12.4272,
+            "threshold": 15,
+            "detail": "drawdown 12.43% approaching limit 15%"
+          },
+          {
+            "name": "lossStreak",
+            "status": "violation",
+            "value": 4,
+            "threshold": 4,
+            "detail": "4 consecutive losses meets/exceeds limit of 4"
+          },
+          {
+            "name": "signalOverride",
+            "status": "ok",
+            "value": 0,
+            "threshold": 3,
+            "detail": "0/3 signal overrides in last hour"
+          }
+        ],
+        "marketContext": {
+          "symbol": "BTCUSDT",
+          "fundingRate": 9.3e-05,
+          "recentVolatility": 7.2074,
+          "lastPrice": 59691.3,
+          "change24h": -0.04224,
+          "source": "bitget-rest",
+          "timestamp": 1782325133662,
+          "ok": true
+        }
+      }
+    }
+  },
+  "GET /api/market": {
+    "symbol": "BTCUSDT",
+    "fundingRate": 9e-05,
+    "recentVolatility": 7.1877,
+    "lastPrice": 59854.99,
+    "change24h": -0.03991,
+    "source": "bitget-rest",
+    "timestamp": 1782325280169,
+    "ok": true
+  },
+  "GET /api/supervisor": {
+    "source": "heuristic",
+    "timestamp": 1782325281498,
+    "topRisk": {
+      "agentId": "charlie-bleeder",
+      "reason": "lowest trust (42, unsafe)"
+    },
+    "earlyWarnings": [
+      {
+        "agentId": "delta-flipper",
+        "signal": "frequency on track to breach in ~5 trades"
+      },
+      {
+        "agentId": "echo-revenge",
+        "signal": "frequency on track to breach in ~8 trades"
+      },
+      {
+        "agentId": "echo-revenge",
+        "signal": "positionDrift on track to breach in ~6 trades"
+      },
+      {
+        "agentId": "charlie-bleeder",
+        "signal": "frequency on track to breach in ~4 trades"
+      }
+    ],
+    "fleetAssessment": "Fleet broadly stable; 3/5 agents healthy."
+  }
+}
