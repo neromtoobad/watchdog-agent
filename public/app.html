@@ -69,6 +69,19 @@
   .ev .tm{color:var(--muted-2);font-family:'JetBrains Mono',monospace;font-size:10.5px;}
   .ev.ok .dot{background:var(--green)} .ev.warn .dot{background:var(--amber)} .ev.crit .dot{background:var(--red)}
 
+  /* live Bitget market ticker (topbar) */
+  .market{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,0.02);}
+  .market .mk-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(58,217,160,0.7);animation:pulse 1.8s infinite;}
+  .market.offline .mk-dot{background:var(--muted-2);box-shadow:none;animation:none;}
+  .market .mk-sym{color:var(--muted-2);font-weight:600;letter-spacing:.04em;}
+  .market .mk-px{color:var(--text);font-weight:600;}
+  .market .mk-chg.up{color:var(--green);} .market .mk-chg.down{color:var(--red);}
+  .market .mk-sep{color:var(--muted-2);}
+  .market .mk-fund{color:var(--muted);}
+  @media (max-width:1100px){ .market .mk-sep, .market .mk-fund{display:none;} }
+  @media (max-width:760px){ .market{display:none;} }
+
   /* AI Risk Officer */
   #risk-officer{margin-top:4px;border-color:rgba(46,230,207,0.22);}
   .panel-head h2 .it{font-style:italic;color:var(--muted);font-weight:400;font-size:14px;}
@@ -161,6 +174,14 @@
           <div class="sub" id="topbar-sub">Behavioral credit scoring · · agents under watch</div>
         </div>
         <div class="right">
+          <div class="market" id="market" title="live Bitget market data via bgc --read-only">
+            <span class="mk-dot"></span>
+            <span class="mk-sym">BTC</span>
+            <span class="mk-px mono" id="mk-price">--</span>
+            <span class="mk-chg mono" id="mk-change">--</span>
+            <span class="mk-sep">·</span>
+            <span class="mk-fund mono" id="mk-funding">fund --</span>
+          </div>
           <div class="updated" id="updated">connecting…</div>
           <div class="icon-btn" id="bell" title="incidents">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -529,16 +550,40 @@ async function askRiskOfficer(){
   finally{ btn.disabled=false; }
 }
 
+// ── live Bitget market ticker (via bgc --read-only) ──
+async function tickMarket(){
+  const el=document.getElementById('market');
+  try{
+    const m=await fetch('/api/market',{cache:'no-store'}).then(x=>x.json());
+    if(!m || !m.ok){
+      el.classList.add('offline');
+      document.getElementById('mk-price').textContent='offline';
+      document.getElementById('mk-change').textContent='';
+      document.getElementById('mk-funding').textContent='bgc unreachable';
+      return;
+    }
+    el.classList.remove('offline');
+    document.getElementById('mk-price').textContent='$'+Number(m.lastPrice).toLocaleString(undefined,{maximumFractionDigits:0});
+    const chgEl=document.getElementById('mk-change');
+    const chgPct=(m.change24h!=null? m.change24h*100 : 0);
+    chgEl.textContent=(chgPct>=0?'+':'')+chgPct.toFixed(2)+'%';
+    chgEl.className='mk-chg mono '+(chgPct>=0?'up':'down');
+    const fund=(m.fundingRate!=null? (m.fundingRate*100).toFixed(4)+'%' : '--');
+    document.getElementById('mk-funding').textContent='funding '+fund;
+  }catch(e){ el.classList.add('offline'); document.getElementById('mk-price').textContent='offline'; }
+}
+
 window.addEventListener('load',()=>{
   const rvs=[...document.querySelectorAll('.rv')];
   rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
   setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
   document.getElementById('ro-send').addEventListener('click',askRiskOfficer);
   document.getElementById('ro-q').addEventListener('keydown',(e)=>{ if(e.key==='Enter') askRiskOfficer(); });
-  tickStatus(); tickFleet(); tickSupervisor();
+  tickStatus(); tickFleet(); tickSupervisor(); tickMarket();
   setInterval(tickStatus,POLL_MS);
   setInterval(tickFleet,FLEET_POLL_MS);
   setInterval(tickSupervisor,8000);
+  setInterval(tickMarket,20000);
 });
 </script>
 </body>

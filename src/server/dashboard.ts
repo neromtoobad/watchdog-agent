@@ -2,6 +2,26 @@ import express, { Request, Response } from 'express';
 import * as http from 'http';
 import * as path from 'path';
 import { Watchdog, WatchdogEvent } from '../index';
+import { getMarketContext, MarketContext } from '../market/context';
+
+/** Cached live Bitget market context (via bgc --read-only). bgc shells out and
+ *  is slow, so we refresh on an interval and serve the cache to /api/market. */
+let marketCache: MarketContext | null = null;
+let marketFetching = false;
+const MARKET_TTL_MS = 20_000;
+async function refreshMarket(symbol = 'BTCUSDT'): Promise<MarketContext> {
+  if (marketFetching && marketCache) return marketCache;
+  if (marketCache && Date.now() - marketCache.timestamp < MARKET_TTL_MS) return marketCache;
+  marketFetching = true;
+  try {
+    marketCache = await getMarketContext(symbol);
+  } catch (e) {
+    marketCache = { symbol, fundingRate: null, recentVolatility: null, lastPrice: null, change24h: null, source: 'bgc', timestamp: Date.now(), ok: false, errors: [(e as Error).message] };
+  } finally {
+    marketFetching = false;
+  }
+  return marketCache;
+}
 
 /** Reconstruct closed trades FIFO-per-symbol from the event stream. */
 export interface LedgerTrade {
@@ -125,6 +145,11 @@ export function createDashboardServer(watchdog: Watchdog, port: number): Promise
     res.json(buildLedger(watchdog));
   });
 
+  app.get('/api/market', async (_req: Request, res: Response) => {
+    res.json(await refreshMarket());
+  });
+  void refreshMarket(); // warm the cache on boot so the first poll is instant
+
   app.use(express.json());
 
   // LAYER 6 — the AI behavioral supervisor
@@ -180,6 +205,7 @@ export function createDashboardServer(watchdog: Watchdog, port: number): Promise
       console.log(`  → ${url}/api/status`);
       console.log(`  → ${url}/api/events`);
       console.log(`  → ${url}/api/ledger                (reconstructed trade ledger)`);
+      console.log(`  → ${url}/api/market                (live Bitget market via bgc --read-only)`);
       console.log(`  → ${url}/api/leaderboard`);
       console.log(`  → ${url}/api/audit`);
       console.log(`  → ${url}/api/health`);
