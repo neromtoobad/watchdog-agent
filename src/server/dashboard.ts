@@ -117,7 +117,12 @@ export interface DashboardServer {
   close: () => Promise<void>;
 }
 
-export function createDashboardServer(watchdog: Watchdog, port: number): Promise<DashboardServer> {
+/**
+ * Build the Express app with all routes wired, WITHOUT calling listen().
+ * Used directly by serverless hosts (Vercel) and wrapped by
+ * createDashboardServer() for local/standalone use.
+ */
+export function createDashboardApp(watchdog: Watchdog): express.Express {
   const startedAt = Date.now();
   const app = express();
 
@@ -192,6 +197,12 @@ export function createDashboardServer(watchdog: Watchdog, port: number): Promise
 
   // serve landing page + dashboard html + assets
   app.use(express.static(publicDir));
+
+  return app;
+}
+
+export function createDashboardServer(watchdog: Watchdog, port: number): Promise<DashboardServer> {
+  const app = createDashboardApp(watchdog);
 
   return new Promise<DashboardServer>((resolve, reject) => {
     const server = app.listen(port, () => {
