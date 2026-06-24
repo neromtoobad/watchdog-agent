@@ -174,7 +174,7 @@
           <div class="sub" id="topbar-sub">Behavioral credit scoring · · agents under watch</div>
         </div>
         <div class="right">
-          <div class="market" id="market" title="live Bitget market data via bgc --read-only">
+          <div class="market" id="market" title="live read-only Bitget market data (bgc, REST fallback)">
             <span class="mk-dot"></span>
             <span class="mk-sym">BTC</span>
             <span class="mk-px mono" id="mk-price">--</span>
@@ -559,7 +559,7 @@ async function tickMarket(){
       el.classList.add('offline');
       document.getElementById('mk-price').textContent='offline';
       document.getElementById('mk-change').textContent='';
-      document.getElementById('mk-funding').textContent='bgc unreachable';
+      document.getElementById('mk-funding').textContent='market unreachable';
       return;
     }
     el.classList.remove('offline');
