@@ -81,6 +81,13 @@
   .market .mk-fund{color:var(--muted);}
   @media (max-width:1100px){ .market .mk-sep, .market .mk-fund{display:none;} }
   @media (max-width:760px){ .market{display:none;} }
+  /* self-running demo button */
+  .demo-btn{cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(58,217,160,0.12);color:var(--green);
+    font:600 12px/1 inherit;letter-spacing:.02em;padding:8px 12px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;
+    transition:background .15s,color .15s,border-color .15s;}
+  .demo-btn:hover{background:rgba(58,217,160,0.2);}
+  .demo-btn.playing{background:rgba(251,106,94,0.16);color:var(--red);border-color:rgba(251,106,94,0.32);}
+  @media (max-width:760px){ .demo-btn{display:none;} }
 
   /* AI Risk Officer */
   #risk-officer{margin-top:4px;border-color:rgba(46,230,207,0.22);}
@@ -182,6 +189,7 @@
             <span class="mk-sep">·</span>
             <span class="mk-fund mono" id="mk-funding">fund --</span>
           </div>
+          <button class="demo-btn" id="demoBtn" title="Play a self-running behavioral incident — ideal for demos and screen recording">▶ play demo</button>
           <div class="updated" id="updated">connecting…</div>
           <div class="icon-btn" id="bell" title="incidents">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -348,6 +356,7 @@
 })();
 
 const POLL_MS=2000, FLEET_POLL_MS=3000, SCORE_HISTORY_MAX=9;
+let demoActive=false;  // when the self-running demo is playing, live pollers stand down
 function scoreColor(s){return s>=80?'var(--green)':s>=50?'var(--amber)':'var(--red)';}
 function statusFor(band){return band==='healthy'?'ok':band==='caution'?'watch':'paused';}
 function statusLabel(st){return st==='ok'?'Healthy':st==='watch'?'Watch':'Paused';}
@@ -499,6 +508,7 @@ function renderEvents(events){
 }
 
 async function tickStatus(){
+  if(demoActive) return;
   try{
     const [sRes,eRes]=await Promise.all([fetch('/api/status',{cache:'no-store'}),fetch('/api/events',{cache:'no-store'})]);
     const s=await sRes.json(), events=await eRes.json();
@@ -507,6 +517,7 @@ async function tickStatus(){
   } catch(e){ document.getElementById('updated').textContent='reconnecting…'; }
 }
 async function tickFleet(){
+  if(demoActive) return;
   try{
     const [lRes,sRes]=await Promise.all([fetch('/api/leaderboard',{cache:'no-store'}),fetch('/api/status',{cache:'no-store'})]);
     renderLeaderboard(await lRes.json());
@@ -521,6 +532,7 @@ async function tickFleet(){
 
 // ── AI Risk Officer ──
 async function tickSupervisor(){
+  if(demoActive) return;
   try{
     const r=await fetch('/api/supervisor',{cache:'no-store'}).then(x=>x.json());
     const src=document.getElementById('sup-source');
@@ -573,17 +585,108 @@ async function tickMarket(){
   }catch(e){ el.classList.add('offline'); document.getElementById('mk-price').textContent='offline'; }
 }
 
+// ────────────────────────────────────────────────────────────────────
+// Self-running demo. Drives the REAL dashboard widgets (gauge, metrics,
+// activity feed, leaderboard, AI risk officer, incident card) through a
+// full behavioral incident, so the dashboard can be screen-recorded with
+// zero terminal. Toggle with the "play demo" button or open ?demo=1.
+// ────────────────────────────────────────────────────────────────────
+const DEMO_AGENT='atlas-momentum';
+const DEMO_PEERS=[
+  {agentId:'aria-scalper', trustScore:96, band:'healthy', trend:'up',   incidents:0, totalTrades:64},
+  {agentId:'nova-grid',    trustScore:88, band:'healthy', trend:'flat', incidents:0, totalTrades:51},
+  {agentId:'vega-dca',     trustScore:81, band:'healthy', trend:'flat', incidents:0, totalTrades:37},
+];
+function demoMetrics(freq,pd,dd,ls,so){
+  const st=(v,t,w)=> v>=t?'violation':v>=w?'warning':'ok';
+  return {
+    frequency:{value:freq,threshold:10,status:st(freq,11,8)},
+    positionDrift:{value:pd,threshold:25,status:st(pd,25,20)},
+    drawdown:{value:dd,threshold:15,status:st(dd,15,12)},
+    lossStreak:{value:ls,threshold:4,status:st(ls,4,3)},
+    signalOverride:{value:so,threshold:3,status:st(so,3,3)},
+  };
+}
+const DEMO_FRAMES=[
+ {t:100,band:'healthy',freq:2, pd:9, dd:0,  ls:0, so:0, ev:{cls:'ok',  tx:'<b>checkTrade()</b> approved BTCUSDT long · size 300'}},
+ {t:98, band:'healthy',freq:4, pd:10,dd:0,  ls:0, so:0, ev:{cls:'ok',  tx:'<b>checkTrade()</b> approved BTCUSDT long · size 300'}},
+ {t:95, band:'healthy',freq:6, pd:11,dd:0,  ls:0, so:0, ev:{cls:'ok',  tx:'<b>checkTrade()</b> approved BTCUSDT long · size 320'}},
+ {t:90, band:'caution',freq:8, pd:12,dd:1,  ls:0, so:0, ev:{cls:'warn', tx:'<b>forecast</b> frequency breach in ~3 trades'}},
+ {t:84, band:'caution',freq:9, pd:13,dd:2,  ls:0, so:0, ev:{cls:'ok',  tx:'<b>checkTrade()</b> approved BTCUSDT long · size 340'}},
+ {t:77, band:'caution',freq:10,pd:14,dd:4,  ls:0, so:0, ev:{cls:'ok',  tx:'<b>checkTrade()</b> approved BTCUSDT long · size 360'}},
+ {t:70, band:'caution',freq:11,pd:14,dd:5,  ls:0, so:0, ev:{cls:'crit', tx:'<b>violation</b> · frequency: 11 trades in last hour exceeds limit of 10'}},
+ {t:63, band:'caution',freq:11,pd:15,dd:8,  ls:1, so:0, ev:{cls:'crit', tx:'<b>trade closed</b> · BTCUSDT pnl -180'}},
+ {t:55, band:'unsafe', freq:11,pd:16,dd:11, ls:2, so:0, ev:{cls:'crit', tx:'<b>trade closed</b> · BTCUSDT pnl -220'}},
+ {t:48, band:'unsafe', freq:11,pd:17,dd:13, ls:3, so:0, ev:{cls:'warn', tx:'<b>forecast</b> drawdown breach in ~2 trades'}},
+ {t:42, band:'unsafe', freq:11,pd:18,dd:16, ls:4, so:0, ev:{cls:'crit', tx:'<b>violation</b> · drawdown 16% · lossStreak 4'}},
+ {t:39, band:'unsafe', freq:11,pd:18,dd:16, ls:4, so:0, paused:true, ev:{cls:'crit', tx:'<b>agent paused</b> by WATCHDOG'}},
+];
+const DEMO_DIAGNOSIS={
+  source:'ai', timestamp:Date.now(),
+  summary:'atlas-momentum opened 11 trades in under 12 minutes, then took four consecutive losses as drawdown crossed 16%.',
+  likelyCause:'overtrading into a losing streak — reacting to noise as signal (tilt), compounded by fast capital bleed.',
+  recommendation:'auto-paused. Apply a cooldown, halt new opens until equity recovers above the prior peak, and re-tune entry thresholds for this regime.',
+};
+let demoTimer=null, demoIdx=0;
+function demoSetBtn(label,playing){ const b=document.getElementById('demoBtn'); if(!b) return; b.textContent=label; b.classList.toggle('playing',!!playing); }
+function demoLeaderboard(trust,band,paused){
+  const atlas={agentId:DEMO_AGENT,trustScore:trust,band,trend:'down',incidents:paused?1:0,totalTrades:33};
+  const profiles=[...DEMO_PEERS,atlas].sort((a,b)=>b.trustScore-a.trustScore);
+  renderLeaderboard(profiles); renderStats(profiles,{paused:false});
+}
+function demoSupervisor(trust){
+  document.getElementById('sup-source').innerHTML='<span class="d"></span>AI supervisor';
+  document.getElementById('ro-toprisk').textContent=DEMO_AGENT;
+  document.getElementById('ro-toprisk-why').textContent='trust '+trust+' and falling · overtrading + drawdown';
+  document.getElementById('ro-warnings').innerHTML='<div class="ro-warn"><span class="b">⚡</span><span><span class="a">'+DEMO_AGENT+'</span> · frequency 3.1σ above its own baseline</span></div>';
+  document.getElementById('ro-fleet').textContent='1 of 4 agents degrading; '+DEMO_AGENT+' is the acute risk and has been auto-paused.';
+}
+function demoStep(){
+  if(demoIdx>=DEMO_FRAMES.length){ demoFinish(); return; }
+  const f=DEMO_FRAMES[demoIdx++];
+  renderMonitor({agentId:DEMO_AGENT,trustScore:{score:f.t,band:f.band,trend:'down'},paused:!!f.paused});
+  renderMetrics(demoMetrics(f.freq,f.pd,f.dd,f.ls,f.so));
+  if(f.ev) addEvent({cls:f.ev.cls,tx:f.ev.tx,tm:hhmm()},true);
+  demoLeaderboard(f.t,f.band,!!f.paused);
+  if(f.t<=63) demoSupervisor(f.t);
+  document.getElementById('updated').textContent='● DEMO · '+hhmmss();
+  demoTimer=setTimeout(demoStep,1300);
+}
+function demoFinish(){
+  renderIncident({...DEMO_DIAGNOSIS,timestamp:Date.now()},DEMO_AGENT);
+  document.getElementById('bell').classList.add('alert');
+  demoSetBtn('↺ replay demo',false);
+  demoTimer=null;
+}
+function startDemo(){
+  demoActive=true; demoIdx=0;
+  if(demoTimer){ clearTimeout(demoTimer); demoTimer=null; }
+  scoreHistory.length=0; feed.innerHTML=''; seen.clear(); renderIncident(null);
+  demoSetBtn('■ stop demo',true);
+  demoStep();
+}
+function stopDemo(){
+  demoActive=false;
+  if(demoTimer){ clearTimeout(demoTimer); demoTimer=null; }
+  demoSetBtn('▶ play demo',false);
+  tickStatus(); tickFleet(); tickSupervisor(); // resume live data
+}
+function toggleDemo(){ (demoActive && demoTimer) ? stopDemo() : startDemo(); }
+
 window.addEventListener('load',()=>{
   const rvs=[...document.querySelectorAll('.rv')];
   rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
   setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
   document.getElementById('ro-send').addEventListener('click',askRiskOfficer);
   document.getElementById('ro-q').addEventListener('keydown',(e)=>{ if(e.key==='Enter') askRiskOfficer(); });
+  const demoBtn=document.getElementById('demoBtn'); if(demoBtn) demoBtn.addEventListener('click',toggleDemo);
   tickStatus(); tickFleet(); tickSupervisor(); tickMarket();
   setInterval(tickStatus,POLL_MS);
   setInterval(tickFleet,FLEET_POLL_MS);
   setInterval(tickSupervisor,8000);
   setInterval(tickMarket,20000);
+  // auto-play for recording: open /app?demo=1
+  if(/[?&]demo=1\b/.test(location.search) || location.hash==='#demo') setTimeout(startDemo,900);
 });
 </script>
 </body>
