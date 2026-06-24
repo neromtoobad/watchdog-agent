@@ -1,0 +1,11 @@
+.env
+.env.*
+*.local.json
+*.tgz
+coverage/
+node_modules/
+.git/
+.claude/
+VIDEO_SCRIPT.md
+docs/sample-outputs/
+test/
