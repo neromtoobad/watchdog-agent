@@ -1,0 +1,139 @@
+{
+  "description": "Sample input/output: gating an overtrading agent (limit 5 trades/hr, onViolation=pause). First 5 opens approved; once the frequency rule breaks, WATCHDOG blocks and the trust score drops.",
+  "agentConfig": {
+    "agentId": "sample-overtrader",
+    "portfolioUsdt": 10000,
+    "maxTradesPerHour": 5,
+    "onViolation": "pause"
+  },
+  "records": [
+    {
+      "call": 1,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": true,
+        "reason": null,
+        "trustScore": 100,
+        "action": null
+      }
+    },
+    {
+      "call": 2,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": true,
+        "reason": null,
+        "trustScore": 100,
+        "action": null
+      }
+    },
+    {
+      "call": 3,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": true,
+        "reason": null,
+        "trustScore": 100,
+        "action": null
+      }
+    },
+    {
+      "call": 4,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": true,
+        "reason": null,
+        "trustScore": 91,
+        "action": null
+      }
+    },
+    {
+      "call": 5,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": true,
+        "reason": null,
+        "trustScore": 87,
+        "action": null
+      }
+    },
+    {
+      "call": 6,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": false,
+        "reason": "frequency: 6 trades in last hour exceeds limit of 5",
+        "trustScore": 77,
+        "action": "pause"
+      }
+    },
+    {
+      "call": 7,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": false,
+        "reason": "agent paused by watchdog",
+        "trustScore": 77,
+        "action": "pause"
+      }
+    },
+    {
+      "call": 8,
+      "input": {
+        "type": "open",
+        "symbol": "BTCUSDT",
+        "sizeUsdt": 100,
+        "direction": "long"
+      },
+      "output": {
+        "approved": false,
+        "reason": "agent paused by watchdog",
+        "trustScore": 77,
+        "action": "pause"
+      }
+    }
+  ],
+  "finalStatus": {
+    "paused": true,
+    "trust": {
+      "score": 77,
+      "band": "caution",
+      "trend": "down"
+    }
+  }
+}

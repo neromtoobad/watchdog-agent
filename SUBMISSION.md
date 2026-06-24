@@ -30,3 +30,27 @@ MCP server, so any agent gates trades with zero code.
 
 Bitget modules: bgc spot and futures read-only market data, plus the GetAgent
 Playbook. Three lines to integrate. No black boxes.
+
+## Verifiable usage records
+
+- **Reproducible benchmark** — [BENCHMARK.md](BENCHMARK.md): 10/10 misbehavior
+  classes caught, 0% false positives, 8.44 mean trades-to-detection.
+  Regenerate with `npm run benchmark`.
+- **Test-run log** — [docs/sample-outputs/test-run.log](docs/sample-outputs/test-run.log):
+  192/192 tests passing. Reproduce with `npm test`.
+- **Core sample input/output** — [docs/sample-outputs/checktrade-sample.json](docs/sample-outputs/checktrade-sample.json):
+  an overtrading agent gated trade-by-trade (5 approved, 3 blocked, trust falls, auto-pause).
+- **AI incident diagnosis** — [docs/sample-outputs/diagnosis-sample.json](docs/sample-outputs/diagnosis-sample.json)
+  and [ai-sample.json](docs/sample-outputs/ai-sample.json).
+- **Live Bitget market data (read-only)** — [ticker-sample.json](docs/sample-outputs/ticker-sample.json),
+  [funding-sample.json](docs/sample-outputs/funding-sample.json); live at
+  https://bitget-indol.vercel.app/api/market
+- **Trust badges (SVG)** — [docs/sample-outputs/](docs/sample-outputs/); live at
+  https://bitget-indol.vercel.app/badge/charlie-bleeder
+- **GetAgent Playbook run** — [playbook-run-sample.json](docs/sample-outputs/playbook-run-sample.json).
+
+## Submission links
+
+- **GitHub:** https://github.com/neromtoobad/watchdog-agent
+- **Live deployment:** https://bitget-indol.vercel.app/app
+- **Live leaderboard:** https://bitget-indol.vercel.app/leaderboard.html
