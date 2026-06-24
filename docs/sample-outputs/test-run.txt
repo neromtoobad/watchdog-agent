@@ -1,0 +1,35 @@
+The CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.
+
+ RUN  v1.6.1 /Users/MAC/Downloads/bitget
+
+ ✓ test/signalOverride.test.ts  (9 tests) 2ms
+ ✓ test/baseline.test.ts  (10 tests) 3ms
+ ✓ test/forecast.test.ts  (12 tests) 3ms
+ ✓ test/trustScore.test.ts  (10 tests) 5ms
+ ✓ test/supervisor.test.ts  (8 tests) 3ms
+ ✓ test/llm.test.ts  (9 tests) 22ms
+ ✓ test/watchdog.test.ts  (11 tests) 13ms
+ ✓ test/playbook-adapter.test.ts  (7 tests) 12ms
+stderr | test/playbook-adapter.test.ts > replayPlaybookRun — adapter > the sample fixture loads, replays, and trips revenge-trader behavior
+[WATCHDOG] log — lossStreak: 4 consecutive losses meets/exceeds limit of 4
+
+ ✓ test/ledger.test.ts  (10 tests) 8ms
+ ✓ test/lossStreak.test.ts  (10 tests) 2ms
+ ✓ test/drawdown.test.ts  (7 tests) 3ms
+ ✓ test/engine.test.ts  (6 tests) 3ms
+ ✓ test/positionDrift.test.ts  (7 tests) 3ms
+ ✓ test/fleet.test.ts  (8 tests) 16ms
+ ✓ test/watchdog-extras.test.ts  (6 tests) 6ms
+ ✓ test/frequency.test.ts  (6 tests) 2ms
+ ✓ test/audit.test.ts  (8 tests) 4ms
+ ✓ test/badge.test.ts  (10 tests) 2ms
+ ✓ test/buffer.test.ts  (6 tests) 3ms
+ ✓ test/scenarios-coverage.test.ts  (15 tests) 4ms
+ ✓ test/diagnosis.test.ts  (5 tests) 3828ms
+ ✓ test/playbook-client.test.ts  (12 tests) 7094ms
+
+ Test Files  22 passed (22)
+      Tests  192 passed (192)
+   Start at  19:04:22
+   Duration  7.35s (transform 524ms, setup 0ms, collect 1.18s, tests 11.04s, environment 3ms, prepare 1.34s)
+

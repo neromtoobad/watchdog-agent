@@ -36,7 +36,7 @@ Playbook. Three lines to integrate. No black boxes.
 - **Reproducible benchmark** — [BENCHMARK.md](BENCHMARK.md): 10/10 misbehavior
   classes caught, 0% false positives, 8.44 mean trades-to-detection.
   Regenerate with `npm run benchmark`.
-- **Test-run log** — [docs/sample-outputs/test-run.log](docs/sample-outputs/test-run.log):
+- **Test-run log** — [docs/sample-outputs/test-run.txt](docs/sample-outputs/test-run.txt):
   192/192 tests passing. Reproduce with `npm test`.
 - **Core sample input/output** — [docs/sample-outputs/checktrade-sample.json](docs/sample-outputs/checktrade-sample.json):
   an overtrading agent gated trade-by-trade (5 approved, 3 blocked, trust falls, auto-pause).
