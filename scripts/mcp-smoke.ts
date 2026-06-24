@@ -25,7 +25,7 @@ async function main() {
   console.log('\n[tools exposed]');
   names.forEach((n) => console.log('   · ' + n));
   check('exposes watchdog_check_trade', names.includes('watchdog_check_trade'));
-  check('exposes 7 tools', names.length === 7);
+  check('exposes 9 tools', names.length === 9);
 
   const callJson = async (name: string, args: Record<string, unknown>) => {
     const r: any = await client.callTool({ name, arguments: args });

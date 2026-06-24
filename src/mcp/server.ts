@@ -167,7 +167,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
   // stderr is safe for logs; stdout is the MCP transport
-  process.stderr.write('[watchdog-mcp] ready — 7 tools exposed over stdio\n');
+  process.stderr.write('[watchdog-mcp] ready — 9 tools exposed over stdio\n');
 }
 
 main().catch((e) => {
