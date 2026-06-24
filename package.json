@@ -64,6 +64,7 @@
     "dashboard": "ts-node examples/demo-agent.ts",
     "demo:chaos": "ts-node examples/chaos-agent.ts",
     "demo:fleet": "ts-node examples/fleet-demo.ts",
+    "demo:live": "ts-node examples/live-demo.ts",
     "pitch": "ts-node examples/pitch.ts",
     "mcp": "ts-node src/mcp/server.ts",
     "prepublishOnly": "npm run build",

@@ -179,9 +179,12 @@ npm test                                    # 192/192, ~1s
 # 2. the chaos benchmark — writes BENCHMARK.md
 npm run benchmark
 
-# 3. the live dashboard demos (open http://localhost:3000)
+# 3. the REAL live demo — a paper-trading fleet on live Bitget price (opens the dashboard automatically)
+npm run demo:live        # 3 real strategies trade live BTCUSDT; WATCHDOG catches the overtrader in real time
+
+# other dashboard demos (open http://localhost:3000)
 WATCHDOG_PORT=3000 npx ts-node examples/demo-agent.ts        # well-behaved baseline
-WATCHDOG_PORT=3000 npx ts-node examples/chaos-agent.ts       # THE demo — trust falls, agent pauses, AI diagnosis appears
+WATCHDOG_PORT=3000 npx ts-node examples/chaos-agent.ts       # trust falls, agent pauses, AI diagnosis appears
 WATCHDOG_PORT=3000 npx ts-node examples/fleet-demo.ts        # 5 agents, leaderboard re-ranks live
 ```
 
