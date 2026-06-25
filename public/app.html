@@ -92,6 +92,14 @@
   .explainer .x:hover{color:var(--text);}
   @media(max-width:640px){ .explainer{align-items:flex-start;font-size:12px;} }
 
+  /* live-demo button */
+  .demo-btn{cursor:pointer;border:1px solid rgba(255,255,255,0.12);background:rgba(58,217,160,0.12);color:var(--green);
+    font:600 12px/1 inherit;letter-spacing:.02em;padding:8px 12px;border-radius:10px;display:inline-flex;align-items:center;gap:6px;
+    transition:background .15s,color .15s,border-color .15s;white-space:nowrap;}
+  .demo-btn:hover{background:rgba(58,217,160,0.2);}
+  .demo-btn.playing{background:rgba(251,106,94,0.16);color:var(--red);border-color:rgba(251,106,94,0.32);}
+  @media(max-width:760px){ .demo-btn{display:none;} }
+
   /* AI Risk Officer */
   #risk-officer{margin-top:4px;border-color:rgba(46,230,207,0.22);}
   .panel-head h2 .it{font-style:italic;color:var(--muted);font-weight:400;font-size:14px;}
@@ -192,6 +200,7 @@
             <span class="mk-sep">·</span>
             <span class="mk-fund mono" id="mk-funding">fund --</span>
           </div>
+          <button class="demo-btn" id="demoBtn" title="Run a real live paper-trading demo — live Bitget price, real WATCHDOG verdicts">▶ run live demo</button>
           <div class="updated" id="updated">connecting…</div>
           <div class="icon-btn" id="bell" title="incidents">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
@@ -365,6 +374,7 @@
 })();
 
 const POLL_MS=2000, FLEET_POLL_MS=3000, SCORE_HISTORY_MAX=9;
+let demoActive=false;  // when the live demo is running, the seeded-snapshot pollers stand down
 function scoreColor(s){return s>=80?'var(--green)':s>=50?'var(--amber)':'var(--red)';}
 function statusFor(band){return band==='healthy'?'ok':band==='caution'?'watch':'paused';}
 function statusLabel(st){return st==='ok'?'Healthy':st==='watch'?'Watch':'Paused';}
@@ -516,6 +526,7 @@ function renderEvents(events){
 }
 
 async function tickStatus(){
+  if(demoActive) return;
   try{
     const [sRes,eRes]=await Promise.all([fetch('/api/status',{cache:'no-store'}),fetch('/api/events',{cache:'no-store'})]);
     const s=await sRes.json(), events=await eRes.json();
@@ -524,6 +535,7 @@ async function tickStatus(){
   } catch(e){ document.getElementById('updated').textContent='reconnecting…'; }
 }
 async function tickFleet(){
+  if(demoActive) return;
   try{
     const [lRes,sRes]=await Promise.all([fetch('/api/leaderboard',{cache:'no-store'}),fetch('/api/status',{cache:'no-store'})]);
     renderLeaderboard(await lRes.json());
@@ -538,6 +550,7 @@ async function tickFleet(){
 
 // ── AI Risk Officer ──
 async function tickSupervisor(){
+  if(demoActive) return;
   try{
     const r=await fetch('/api/supervisor',{cache:'no-store'}).then(x=>x.json());
     const src=document.getElementById('sup-source');
@@ -590,17 +603,98 @@ async function tickMarket(){
   }catch(e){ el.classList.add('offline'); document.getElementById('mk-price').textContent='offline'; }
 }
 
+// ────────────────────────────────────────────────────────────────────
+// LIVE demo — runs entirely in the browser, no terminal. Three real
+// strategies trade on the LIVE Bitget price (/api/market). Every trade is
+// scored by the REAL WATCHDOG engine server-side (/api/evaluate). Real
+// prices in, real trust scores / violations / incidents out. Nothing scripted.
+// ────────────────────────────────────────────────────────────────────
+const LIVE_RULES={
+  disciplined:{maxTradesPerHour:80,maxPositionSizePercent:25,maxDrawdownPercent:15,maxConsecutiveLosses:5,maxSignalOverridesPerHour:6},
+  overtrader:{maxTradesPerHour:10,maxPositionSizePercent:25,maxDrawdownPercent:15,maxConsecutiveLosses:4,maxSignalOverridesPerHour:3},
+  revenge:{maxTradesPerHour:60,maxPositionSizePercent:25,maxDrawdownPercent:12,maxConsecutiveLosses:4,maxSignalOverridesPerHour:3},
+};
+const LIVE_TICK_MS=3500, LIVE_WINDOW=40;
+let liveAgents=[], livePrices=[], liveTimer=null, liveLast=64000;
+function newLiveAgents(){return [
+  {id:'aria-disciplined',kind:'disciplined',actions:[],entry:null,size:1000,cool:0,state:null},
+  {id:'atlas-overtrader', kind:'overtrader', actions:[],entry:null,size:800, cool:0,state:null},
+  {id:'nova-revenge',     kind:'revenge',    actions:[],entry:null,size:800, cool:0,state:null},
+];}
+function liveDecide(a,price,roc){
+  const sym='BTCUSDT',pnl=()=>Math.round((price-a.entry)/a.entry*a.size);
+  if(a.kind==='disciplined'){
+    if(a.entry!=null&&roc<-0.0003){a.actions.push({kind:'close',symbol:sym,sizeUsdt:a.size,direction:'long',pnlUsdt:pnl()});a.entry=null;a.cool=2;}
+    else if(a.entry==null&&roc>0.0004&&a.cool<=0){a.size=1000;a.actions.push({kind:'open',symbol:sym,sizeUsdt:1000,direction:'long'});a.entry=price;}
+    if(a.cool>0)a.cool--;
+  } else if(a.kind==='overtrader'){
+    if(a.entry!=null){a.actions.push({kind:'close',symbol:sym,sizeUsdt:a.size,direction:'long',pnlUsdt:pnl()});a.entry=null;}
+    a.size=800;a.actions.push({kind:'open',symbol:sym,sizeUsdt:800,direction:'long'});a.entry=price;
+  } else {
+    if(a.entry!=null){const p=pnl();a.actions.push({kind:'close',symbol:sym,sizeUsdt:a.size,direction:'long',pnlUsdt:p});a.size=p<0?Math.min(a.size*2,5000):800;a.entry=null;}
+    if(a.cool<=0){a.actions.push({kind:'open',symbol:sym,sizeUsdt:a.size,direction:'long'});a.entry=price;a.cool=1;} else a.cool--;
+  }
+  if(a.actions.length>LIVE_WINDOW) a.actions=a.actions.slice(-LIVE_WINDOW);
+}
+async function liveEval(a){
+  try{
+    const r=await fetch('/api/evaluate',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({agentId:a.id,portfolioUsdt:10000,rules:LIVE_RULES[a.kind],actions:a.actions})}).then(x=>x.json());
+    if(r&&r.trustScore) a.state=r;
+  }catch(e){}
+}
+function liveProfile(a){
+  const s=a.state; if(!s) return {agentId:a.id,trustScore:100,band:'healthy',trend:'flat',incidents:0,totalTrades:0};
+  return {agentId:a.id,trustScore:s.trustScore.score,band:s.trustScore.band,trend:s.trustScore.trend,incidents:s.lastDiagnosis?1:0,totalTrades:a.actions.filter(x=>x.kind==='open').length};
+}
+function demoSetBtn(label,playing){const b=document.getElementById('demoBtn');if(!b)return;b.textContent=label;b.classList.toggle('playing',!!playing);}
+async function liveTick(){
+  let price=liveLast;
+  try{const m=await fetch('/api/market',{cache:'no-store'}).then(x=>x.json());if(m&&m.ok&&m.lastPrice)price=m.lastPrice;}catch(e){}
+  liveLast=price;livePrices.push(price);if(livePrices.length>20)livePrices.shift();
+  const roc=livePrices.length>=4?(price-livePrices[livePrices.length-4])/livePrices[livePrices.length-4]:0;
+  liveAgents.forEach(a=>liveDecide(a,price,roc));
+  await Promise.all(liveAgents.map(liveEval));
+  const profiles=liveAgents.map(liveProfile).sort((x,y)=>y.trustScore-x.trustScore);
+  renderLeaderboard(profiles);renderStats(profiles,{paused:false});
+  const focus=[...liveAgents].sort((x,y)=>(x.state?.trustScore?.score??100)-(y.state?.trustScore?.score??100))[0];
+  if(focus.state){renderMonitor(focus.state);renderMetrics(focus.state.status?.metrics||{});renderIncident(focus.state.lastDiagnosis,focus.id);}
+  const worst=profiles[profiles.length-1];
+  document.getElementById('sup-source').innerHTML='<span class="d"></span>'+(focus.state?.lastDiagnosis?.source==='ai'?'AI supervisor':'heuristic');
+  document.getElementById('ro-toprisk').textContent=worst.agentId;
+  document.getElementById('ro-toprisk-why').textContent='trust '+worst.trustScore+' · '+worst.band;
+  document.getElementById('ro-fleet').textContent=worst.band!=='healthy'?(worst.agentId+' is degrading and is the acute fleet risk.'):'all agents within normal behavior.';
+  liveAgents.forEach(a=>{const last=a.actions[a.actions.length-1]; if(last){ if(last.kind==='open')addEvent({cls:'ok',tx:`<b>${a.id}</b> checkTrade() open · size ${last.sizeUsdt}`,tm:hhmm()},true); else if(last.kind==='close')addEvent({cls:last.pnlUsdt<0?'crit':'ok',tx:`<b>${a.id}</b> closed · pnl ${last.pnlUsdt>=0?'+':''}${last.pnlUsdt}`,tm:hhmm()},true);} if(a.state?.paused)addEvent({cls:'crit',tx:`<b>${a.id}</b> auto-paused by WATCHDOG`,tm:hhmm()},true);});
+  document.getElementById('updated').textContent='● LIVE demo · BTC $'+Math.round(price).toLocaleString()+' · '+hhmmss();
+}
+function startDemo(){
+  demoActive=true;
+  if(liveTimer){clearInterval(liveTimer);liveTimer=null;}
+  liveAgents=newLiveAgents();livePrices=[];scoreHistory.length=0;feed.innerHTML='';seen.clear();renderIncident(null);
+  demoSetBtn('■ stop demo',true);
+  liveTick();liveTimer=setInterval(liveTick,LIVE_TICK_MS);
+}
+function stopDemo(){
+  demoActive=false;
+  if(liveTimer){clearInterval(liveTimer);liveTimer=null;}
+  demoSetBtn('▶ run live demo',false);
+  tickStatus();tickFleet();tickSupervisor();
+}
+function toggleDemo(){ demoActive?stopDemo():startDemo(); }
+
 window.addEventListener('load',()=>{
   const rvs=[...document.querySelectorAll('.rv')];
   rvs.forEach((el,i)=>{el.style.animationDelay=(0.05*i)+'s';});
   setTimeout(()=>rvs.forEach(el=>{el.style.animation='none';el.style.opacity='1';el.style.transform='none';}),1100);
   document.getElementById('ro-send').addEventListener('click',askRiskOfficer);
   document.getElementById('ro-q').addEventListener('keydown',(e)=>{ if(e.key==='Enter') askRiskOfficer(); });
+  const demoBtn=document.getElementById('demoBtn'); if(demoBtn) demoBtn.addEventListener('click',toggleDemo);
   tickStatus(); tickFleet(); tickSupervisor(); tickMarket();
   setInterval(tickStatus,POLL_MS);
   setInterval(tickFleet,FLEET_POLL_MS);
   setInterval(tickSupervisor,8000);
   setInterval(tickMarket,20000);
+  if(/[?&]demo=1\b/.test(location.search)) setTimeout(startDemo,1000); // open /app?demo=1 to auto-run
 });
 </script>
 </body>

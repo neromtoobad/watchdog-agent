@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import * as http from 'http';
 import * as path from 'path';
-import { Watchdog, WatchdogEvent } from '../index';
+import { Watchdog, WatchdogEvent, WatchdogRules } from '../index';
 import { getMarketContext, MarketContext } from '../market/context';
 
 /** Cached live Bitget market context (via bgc --read-only). bgc shells out and
@@ -167,6 +167,34 @@ export function createDashboardApp(watchdog: Watchdog): express.Express {
     if (!q.trim()) return res.status(400).json({ error: 'question required' });
     try { res.json(await Watchdog.askSupervisor(q)); }
     catch (e) { res.status(500).json({ error: (e as Error).message }); }
+  });
+
+  // Stateless real evaluation — replays a recent window of an agent's actions
+  // through the REAL WATCHDOG engine and returns its live state. Powers the
+  // in-browser live demo on the deployed site (real prices in, real verdicts out).
+  app.post('/api/evaluate', async (req: Request, res: Response) => {
+    try {
+      const b = (req.body || {}) as Record<string, unknown>;
+      const agentId = typeof b.agentId === 'string' && b.agentId ? b.agentId : 'paper-agent';
+      const portfolioUsdt = Number(b.portfolioUsdt) > 0 ? Number(b.portfolioUsdt) : 10_000;
+      const rules = (b.rules && typeof b.rules === 'object' ? b.rules : {
+        maxTradesPerHour: 10, maxPositionSizePercent: 25, maxDrawdownPercent: 15,
+        maxConsecutiveLosses: 4, maxSignalOverridesPerHour: 3,
+      }) as WatchdogRules;
+      const actions = Array.isArray(b.actions) ? (b.actions as Array<Record<string, unknown>>).slice(-60) : [];
+
+      const w = new Watchdog({ agentId, portfolioUsdt, rules, onViolation: 'pause', ai: { enabled: true }, fleet: { register: false } });
+      for (const a of actions) {
+        const sym = String(a.symbol ?? 'BTCUSDT');
+        const dir = a.direction === 'short' ? 'short' : 'long';
+        if (a.kind === 'open') await w.checkTrade({ type: 'open', symbol: sym, sizeUsdt: Number(a.sizeUsdt) || 0, direction: dir });
+        else if (a.kind === 'close') { await w.checkTrade({ type: 'close', symbol: sym, sizeUsdt: Number(a.sizeUsdt) || 0, direction: dir }); w.reportTradeClosed({ symbol: sym, pnlUsdt: Number(a.pnlUsdt) || 0 }); }
+        else if (a.kind === 'signal') w.reportSignal({ signal: (a.signal as 'bullish' | 'bearish' | 'neutral') || 'neutral', action: String(a.action ?? '') });
+      }
+      await w.flushDiagnosis();
+      const status = w.getStatus();
+      res.json({ agentId, paused: status.paused, status, trustScore: status.trustScore, forecasts: w.getForecast(), lastDiagnosis: w.getLastDiagnosis() });
+    } catch (e) { res.status(400).json({ error: (e as Error).message }); }
   });
 
   app.get('/api/leaderboard', (_req: Request, res: Response) => {
