@@ -60,7 +60,9 @@
 
   /* activity feed */
   .feed{flex:0 0 auto;}
-  .feed-list{padding:8px 12px 12px;display:flex;flex-direction:column;}
+  .feed-list{padding:8px 12px 12px;display:flex;flex-direction:column;max-height:200px;overflow-y:auto;}
+  .feed-list::-webkit-scrollbar{width:7px;}
+  .feed-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
   .ev{display:flex;gap:11px;padding:10px 8px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04);}
   .ev:last-child{border-bottom:none;}
   .ev .dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:0 0 auto;}
@@ -500,7 +502,7 @@ function addEvent(e,prepend){
   row.className='ev '+(e.cls||'ok');
   row.innerHTML=`<span class="dot"></span><span class="tx">${e.tx} <span class="tm">${e.tm}</span></span>`;
   if(prepend) feed.prepend(row); else feed.appendChild(row);
-  while(feed.children.length>4) feed.lastChild.remove();
+  while(feed.children.length>30) feed.lastChild.remove();
 }
 function eventClass(type){if(type==='violation'||type==='pause') return 'crit'; if(type==='signal') return 'warn'; return 'ok';}
 function eventCopy(e){
