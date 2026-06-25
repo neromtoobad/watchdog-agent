@@ -9,7 +9,7 @@
 <script src="/assets/avatar.js"></script>
 <style>
   /* page-specific: dashboard layout */
-  .grid{display:grid;grid-template-columns:1fr 392px;gap:20px;height:646px;min-height:0;}
+  .grid{display:grid;grid-template-columns:1fr 392px;gap:20px;min-height:646px;}
   .rcol{display:flex;flex-direction:column;gap:20px;min-height:0;}
 
   /* live monitor */
@@ -59,7 +59,8 @@
   .ai-tag .d{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
 
   /* activity feed */
-  .feed{flex:0 0 auto;}
+  .lcol{display:flex;flex-direction:column;gap:20px;min-height:0;}
+  .feed{flex:0 0 auto;display:flex;flex-direction:column;}
   .feed-list{padding:8px 12px 12px;display:flex;flex-direction:column;min-height:340px;max-height:460px;overflow-y:auto;}
   .footnote{display:none;} /* avoid the floating footnote overlapping the feed */
   .feed-list::-webkit-scrollbar{width:7px;}
@@ -246,6 +247,8 @@
 
         <!-- CONTENT -->
         <div class="grid">
+          <!-- LEFT COLUMN: leaderboard + activity -->
+          <div class="lcol">
           <!-- LEADERBOARD -->
           <div class="panel rv">
             <div class="panel-head">
@@ -264,6 +267,16 @@
               </table>
             </div>
           </div>
+
+          <!-- ACTIVITY (in the left column, fills the space) -->
+          <div class="panel feed rv">
+            <div class="panel-head">
+              <h2>Activity</h2>
+              <span class="chip live"><span class="d"></span>STREAM</span>
+            </div>
+            <div class="feed-list" id="feed"></div>
+          </div>
+          </div><!-- /lcol -->
 
           <!-- RIGHT COLUMN -->
           <div class="rcol">
@@ -323,13 +336,6 @@
               </div>
             </div>
 
-            <div class="panel feed rv">
-              <div class="panel-head">
-                <h2>Activity</h2>
-                <span class="chip live"><span class="d"></span>STREAM</span>
-              </div>
-              <div class="feed-list" id="feed"></div>
-            </div>
           </div>
         </div>
 
