@@ -127,6 +127,15 @@
   .ro-answer:empty{display:none;}
   .ro-answer .who{color:var(--accent);font-weight:600;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:6px;}
   @media(max-width:900px){.ro-grid{grid-template-columns:1fr;}}
+
+  /* ── normal scrolling page (override the fixed 1440x920 "stage" scaler) ── */
+  html,body{height:auto!important;overflow-x:hidden;overflow-y:auto!important;}
+  #stage{position:static!important;width:100%!important;height:auto!important;transform:none!important;}
+  #app{position:static!important;height:auto!important;min-height:100vh;overflow:visible!important;}
+  .main{height:auto!important;overflow:visible!important;}
+  .canvas{height:auto!important;overflow:visible!important;}
+  /* keep the sidebar in view while you scroll */
+  .sidebar{position:sticky;top:0;align-self:start;height:100vh;}
 </style>
 </head>
 <body>
@@ -375,12 +384,7 @@
 </div>
 
 <script>
-/* stage scaler */
-(function(){
-  const stage=document.getElementById('stage');
-  function fit(){ if(window.innerWidth<=900){ stage.style.transform='none'; } else { const s=Math.min(window.innerWidth/1440, window.innerHeight/920); stage.style.transform='scale('+s+')'; } }
-  window.addEventListener('resize',fit); fit();
-})();
+/* stage scaler disabled — the dashboard is a normal, full-size scrolling page */
 
 const POLL_MS=2000, FLEET_POLL_MS=3000, SCORE_HISTORY_MAX=9;
 let demoActive=false;  // when the live demo is running, the seeded-snapshot pollers stand down
