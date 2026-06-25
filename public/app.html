@@ -82,6 +82,16 @@
   @media (max-width:1100px){ .market .mk-sep, .market .mk-fund{display:none;} }
   @media (max-width:760px){ .market{display:none;} }
 
+  /* "what is this" explainer banner */
+  .explainer{display:flex;align-items:center;gap:12px;background:rgba(46,230,207,0.07);border:1px solid rgba(46,230,207,0.22);
+    border-radius:12px;padding:11px 16px;margin-bottom:18px;font-size:13px;color:#cdd7df;line-height:1.5;}
+  .explainer .ic{flex:0 0 auto;color:var(--accent);font-weight:700;}
+  .explainer b{color:var(--text);}
+  .explainer a{color:var(--accent);font-weight:600;white-space:nowrap;}
+  .explainer .x{margin-left:auto;cursor:pointer;color:var(--muted-2);background:none;border:none;font-size:15px;line-height:1;padding:2px 6px;flex:0 0 auto;}
+  .explainer .x:hover{color:var(--text);}
+  @media(max-width:640px){ .explainer{align-items:flex-start;font-size:12px;} }
+
   /* AI Risk Officer */
   #risk-officer{margin-top:4px;border-color:rgba(46,230,207,0.22);}
   .panel-head h2 .it{font-style:italic;color:var(--muted);font-weight:400;font-size:14px;}
@@ -191,6 +201,13 @@
       </header>
 
       <section class="canvas">
+        <!-- WHAT IS THIS -->
+        <div class="explainer" id="explainer">
+          <span class="ic">ⓘ</span>
+          <span><b>This is a monitoring console, not a consumer app.</b> These are AI trading agents running WATCHDOG. To watch your own agent here, wrap it in 3 lines — <a href="https://github.com/neromtoobad/watchdog-agent/blob/main/QUICKSTART.md" target="_blank" rel="noopener">read the Quickstart →</a></span>
+          <button class="x" onclick="document.getElementById('explainer').remove()" title="dismiss">✕</button>
+        </div>
+
         <!-- STAT CARDS -->
         <div class="stats">
           <div class="stat rv">

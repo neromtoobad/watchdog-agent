@@ -100,6 +100,15 @@
   .layer p{font-size:14px;color:var(--muted)}
   @media(max-width:760px){.layers{grid-template-columns:1fr}}
 
+  /* how-you-use-it steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .step .num{width:30px;height:30px;border-radius:8px;background:rgba(46,230,207,.12);color:var(--accent);font-weight:700;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);margin-bottom:12px}
+  .step h3{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:21px;margin-bottom:8px}
+  .step p{font-size:14px;color:var(--muted)}
+  .step code{font-family:var(--font-mono);font-size:12.5px;color:var(--accent);background:rgba(46,230,207,.08);padding:1px 5px;border-radius:4px}
+  @media(max-width:760px){.steps{grid-template-columns:1fr}}
+
   /* screenshot */
   .shot{width:100%;border-radius:16px;border:1px solid var(--line-2);box-shadow:0 30px 80px -30px rgba(0,0,0,.8);display:block}
 
@@ -126,6 +135,7 @@
     </a>
     <div class="spacer"></div>
     <div class="links">
+      <a href="#use">How you use it</a>
       <a href="#how">How it works</a>
       <a href="#integrate">Integrate</a>
       <a href="https://github.com/neromtoobad/watchdog-agent" target="_blank" rel="noopener">GitHub</a>
@@ -153,6 +163,40 @@
     </div>
   </div>
 </header>
+
+<!-- HOW YOU USE IT -->
+<section class="block" id="use">
+  <div class="wrap">
+    <div class="kicker">How you use it</div>
+    <h2>It's a <span class="it">library</span> you put in your agent.<br/>This dashboard is your <span class="it">console</span>.</h2>
+    <p class="lead">WATCHDOG isn't an app you log into, and it isn't for end-users. It's infrastructure a developer embeds in their own Bitget trading agent, in three lines. Think Datadog, or an SSL certificate, but for agent <em>behavior</em>. The live dashboard is the read-only monitoring view: it shows the agents that are running WATCHDOG.</p>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <h3>Install &amp; wrap</h3>
+        <p><code>npm install watchdog-agent</code>, then wrap your agent. One call before every trade, two after.</p>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <h3>Your agent trades</h3>
+        <p>It runs exactly as before, on your own Bitget logic. WATCHDOG scores every trade and vetoes the dangerous ones.</p>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <h3>Watch the console</h3>
+        <p>Open this dashboard to see your agent's live trust score, forecasts and incident reports, plus the public leaderboard.</p>
+      </div>
+    </div>
+    <div class="code mt"><span class="c">// 1. install:  npm install watchdog-agent</span><br/>
+<span class="k">import</span> { Watchdog } <span class="k">from</span> <span class="s">'watchdog-agent'</span>;<br/>
+<span class="k">const</span> watchdog = <span class="k">new</span> <span class="k">Watchdog</span>({ agentId:<span class="s">'my-bot'</span>, portfolioUsdt:<span class="s">10000</span>, rules:{…}, onViolation:<span class="s">'pause'</span> });<br/>
+<br/>
+<span class="c">// 2. inside your trading loop, before every Bitget order:</span><br/>
+<span class="k">const</span> d = <span class="k">await</span> watchdog.<span class="k">checkTrade</span>({ type:<span class="s">'open'</span>, symbol:<span class="s">'BTCUSDT'</span>, sizeUsdt:<span class="s">100</span>, direction:<span class="s">'long'</span> });<br/>
+<span class="k">if</span> (d.approved) <span class="k">await</span> placeOrder();  <span class="c">// ← your existing Bitget code</span><br/>
+<span class="k">else</span> pauseAgent(d.reason);       <span class="c">// WATCHDOG caught it misbehaving</span></div>
+  </div>
+</section>
 
 <!-- PROBLEM -->
 <section class="block" id="problem">
