@@ -73,6 +73,23 @@ See [BENCHMARK.md](BENCHMARK.md) for the full per-scenario table. The chaos harn
 
 ---
 
+## Verifiable usage records
+
+Every claim is backed by committed, reproducible evidence. The full map — each
+claim → the command that reproduces it → the captured output — is in
+**[VERIFICATION.md](VERIFICATION.md)**.
+
+| Record | What it shows | Reproduce |
+|---|---|---|
+| [docs/evidence/benchmark-run.txt](docs/evidence/benchmark-run.txt) | Full chaos benchmark run — 9/9 caught, 0% false positives, 8.44 mean trades-to-detection | `npm run benchmark` |
+| [docs/sample-outputs/test-run.txt](docs/sample-outputs/test-run.txt) | 192/192 tests passing | `npm test` |
+| [docs/sample-outputs/checktrade-sample.json](docs/sample-outputs/checktrade-sample.json) | Core `checkTrade` input → output: an overtrader gated trade-by-trade (5 approved, 3 blocked, trust falls, auto-pause) | — |
+| [docs/evidence/audit-tamper-demo.txt](docs/evidence/audit-tamper-demo.txt) | Tamper-evidence: rewriting a past audit entry breaks verification (`valid=false, brokenAt=2`) | — |
+| [docs/evidence/live-api-snapshot.json](docs/evidence/live-api-snapshot.json) | Timestamped live responses captured from the deployed API | `curl …/api/leaderboard` |
+| [docs/sample-outputs/diagnosis-sample.json](docs/sample-outputs/diagnosis-sample.json) | AI incident diagnosis (LLM + live Bitget market context) | — |
+
+---
+
 ## Three lines to integrate
 
 > **New here?** The [**Quickstart**](QUICKSTART.md) walks you through install →
